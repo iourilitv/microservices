@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -13,9 +14,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.util.Date;
+import java.util.Set;
 
 @Data
 @EqualsAndHashCode
@@ -26,7 +30,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "first_name", nullable = false)
@@ -45,7 +49,7 @@ public class User {
     @Column(name = "birthday", nullable = false)
     private Date birthday;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "current_city_id", nullable = false)
     private City currentCity;
 
@@ -63,6 +67,20 @@ public class User {
 
     @Column(name = "hard_skills")
     private String hardSkills;
+
+    @ManyToMany
+    @JoinTable(name = "followings_followers",
+            joinColumns = {@JoinColumn(name = "follower_id")},
+            inverseJoinColumns = {@JoinColumn(name = "following_id")}
+    )
+    private Set<User> followings;
+
+    @ManyToMany
+    @JoinTable(name = "followings_followers",
+            joinColumns = {@JoinColumn(name = "following_id")},
+            inverseJoinColumns = {@JoinColumn(name = "follower_id")}
+    )
+    private Set<User> followers;
 
     public User(String firstName, String lastName, Gender gender, Date birthday, City currentCity, String nickname) {
         this.firstName = firstName;
