@@ -1,6 +1,8 @@
 package com.example.microservices.users.entity;
 
 import com.example.microservices.users.enums.Gender;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -14,15 +16,16 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import java.util.Date;
 import java.util.Set;
 
+@JsonInclude(value = JsonInclude.Include.NON_NULL)
 @Data
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = {"followings", "followers"})
 @NoArgsConstructor
 @Entity
 @Table(name = "users")
@@ -49,7 +52,7 @@ public class User {
     @Column(name = "birthday", nullable = false)
     private Date birthday;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "current_city_id", nullable = false)
     private City currentCity;
 
@@ -68,19 +71,17 @@ public class User {
     @Column(name = "hard_skills")
     private String hardSkills;
 
-    @ManyToMany
-    @JoinTable(name = "followings_followers",
-            joinColumns = {@JoinColumn(name = "follower_id")},
-            inverseJoinColumns = {@JoinColumn(name = "following_id")}
-    )
-    private Set<User> followings;
+    @JsonIgnore
+    @OneToMany
+    @JoinColumn(name = "follower_id")
+    @OrderBy("id")
+    private Set<Follow> followings;
 
-    @ManyToMany
-    @JoinTable(name = "followings_followers",
-            joinColumns = {@JoinColumn(name = "following_id")},
-            inverseJoinColumns = {@JoinColumn(name = "follower_id")}
-    )
-    private Set<User> followers;
+    @JsonIgnore
+    @OneToMany
+    @JoinColumn(name = "following_id")
+    @OrderBy("id")
+    private Set<Follow> followers;
 
     public User(String firstName, String lastName, Gender gender, Date birthday, City currentCity, String nickname) {
         this.firstName = firstName;
