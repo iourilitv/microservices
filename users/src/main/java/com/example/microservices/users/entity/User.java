@@ -1,13 +1,11 @@
 package com.example.microservices.users.entity;
 
 import com.example.microservices.users.enums.Gender;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -52,7 +50,7 @@ public class User {
     @Column(name = "birthday", nullable = false)
     private Date birthday;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne
     @JoinColumn(name = "current_city_id", nullable = false)
     private City currentCity;
 
@@ -71,15 +69,13 @@ public class User {
     @Column(name = "hard_skills")
     private String hardSkills;
 
-    @JsonIgnore
     @OneToMany
-    @JoinColumn(name = "follower_id")
+    @JoinColumn(name = "follower_id", updatable = false)
     @OrderBy("id")
     private Set<Follow> followings;
 
-    @JsonIgnore
     @OneToMany
-    @JoinColumn(name = "following_id")
+    @JoinColumn(name = "following_id", updatable = false)
     @OrderBy("id")
     private Set<Follow> followers;
 

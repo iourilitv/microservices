@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -36,14 +37,17 @@ public class FollowService {
     }
 
     @Transactional
-    public String createFollow(Long followingId, Long followerId) {
-        if (followRepository.findByFollowingIdAndFollowerId(followingId, followerId).isPresent()) {
+    public String createFollow(Follow follow) {
+        if (follow.getId() != null
+                || Objects.equals(follow.getFollowingId(), follow.getFollowerId())
+                || followRepository.findByFollowingIdAndFollowerId(follow.getFollowingId(), follow.getFollowerId()).isPresent()
+                    ) {
             throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED);
         }
-        User following = userService.getUser(followingId);
-        User follower = userService.getUser(followerId);
-        Follow follow = new Follow(following, follower);
+        follow.setFollowedAt(follow.getFollowedAt());
         Follow savedFollow = followRepository.save(follow);
+        User following = userService.getUser(follow.getFollowingId());
+        User follower = userService.getUser(follow.getFollowerId());
         return String.format("User(id: %s, nickname: %s) has been followed to User(id: %s, nickname: %s) with Follow(id: %s)",
                 following.getId(), following.getNickname(), follower.getId(), follower.getNickname(), savedFollow.getId());
     }
@@ -52,25 +56,12 @@ public class FollowService {
     public String deleteFollow(Long id) {
         Optional<Follow> existFollowOptional = followRepository.findById(id);
         if (existFollowOptional.isPresent()) {
-            User following = existFollowOptional.get().getFollowing();
-            User follower = existFollowOptional.get().getFollower();
+            User following = userService.getUser(existFollowOptional.get().getFollowingId());
+            User follower = userService.getUser(existFollowOptional.get().getFollowerId());
             followRepository.deleteById(id);
             return String.format("User(id: %s, nickname: %s) has been followed to User(id: %s, nickname: %s) with Follow(id: %s)",
                     following.getId(), following.getNickname(), follower.getId(), follower.getNickname(), existFollowOptional.get().getId());
         }
         return String.format("There is no Follow to delete with id: %s", id);
     }
-//    public String createFollow(Follow follow) {
-//        if (followRepository.findByFollowingIdAndFollowerId(follow.getFollowingId(), follow.getFollowerId()).isPresent()) {
-//            throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED);
-//        }
-//        follow.setFollowedAt(follow.getFollowedAt());
-//        Follow savedFollow = followRepository.save(follow);
-//        User following = userService.getUser(follow.getFollowingId());
-//        following.getFollowers().add(savedFollow);
-//        User follower = userService.getUser(follow.getFollowerId());
-//        follower.getFollowings().add(savedFollow);
-//        return String.format("User(id: %s, nickname: %s) has been followed to User(id: %s, nickname: %s) with Follow(id: %s)",
-//                following.getId(), following.getNickname(), follower.getId(), follower.getNickname(), savedFollow.getId());
-//    }
 }

@@ -1,0 +1,41 @@
+@startuml
+enum Gender {
+    MALE
+    FEMALE
+    OTHER
+}
+
+class City {
+    +id: Long
+    +name: String
+}
+
+class User {
+    +id: Long
+    +firstName: String
+    +lastName: String
+    +secondName: String
+    +gender: Gender
+    +birthday: Date
+    +currentCity: City
+    +nickname: String
+    +email: String
+    +phone: String
+    +about: String
+    +hardSkills: String
+    +followings: Set<Follow>
+    +followers: Set<Follow>
+}
+
+class Follow {
+    +id: Long
+    +followingId: Long
+    +followerId: Long
+    +followedAt: timestamp
+}
+
+City "1" *-- "n" User
+Gender --* User
+Follow o-- "2" User
+
+@enduml
