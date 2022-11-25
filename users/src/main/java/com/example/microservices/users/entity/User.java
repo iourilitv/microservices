@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,8 +20,15 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import java.util.Date;
 import java.util.Set;
+
+/**
+ * Used pattern Soft Delete for deletedAt field.
+ * Source "How to Implement Soft Delete in Spring JPA.": https://www.baeldung.com/spring-jpa-soft-delete
+ */
 
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 @Data
@@ -27,6 +36,8 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 @Table(name = "users")
+@SQLDelete(sql = "UPDATE users SET deleted_at = now() WHERE id = ?")
+@Where(clause = "deleted_at is NULL")
 public class User {
 
     @Id
@@ -68,6 +79,10 @@ public class User {
 
     @Column(name = "hard_skills")
     private String hardSkills;
+
+    @Column(name = "deleted_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date deletedAt;
 
     @OneToMany
     @JoinColumn(name = "follower_id", updatable = false)
