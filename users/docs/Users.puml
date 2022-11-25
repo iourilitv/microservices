@@ -23,6 +23,7 @@ class User {
     +phone: String
     +about: String
     +hardSkills: String
+    +deletedAt: Date
     +followings: Set<Follow>
     +followers: Set<Follow>
 }
@@ -32,6 +33,7 @@ class Follow {
     +followingId: Long
     +followerId: Long
     +followedAt: timestamp
+    +refersDeletedUser: boolean
 }
 
 City "1" *-- "n" User
