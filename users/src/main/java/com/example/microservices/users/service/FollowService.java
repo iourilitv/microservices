@@ -20,6 +20,8 @@ public class FollowService {
     private final FollowRepository followRepository;
     private final UserService userService;
 
+    //TODO It's required to handle Soft Deleted User case for all get methods
+
     public List<Follow> getAll() {
         return (List<Follow>) followRepository.findAll();
     }
