@@ -10,30 +10,20 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
+    private final FollowService followService;
 
     public List<User> getAll() {
-        //TODO It's probably better to do this with a sql query on the repository
-        List<User> users = (List<User>) userRepository.findAll();
-        users.forEach(user -> {
-            reduceFollowingsExcludeFollowWithDeletedUsers(user);
-            reduceFollowersExcludeFollowWithDeletedUsers(user);
-        });
-        return users;
+        return (List<User>) userRepository.findAll();
     }
 
     public User getUser(long id) {
-        //TODO It's probably better to do this with a sql query on the repository
-        User user = userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        reduceFollowingsExcludeFollowWithDeletedUsers(user);
-        reduceFollowersExcludeFollowWithDeletedUsers(user);
-        return user;
+        return userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     public String updateUser(User user) {
@@ -57,20 +47,7 @@ public class UserService {
         }
         User user = userInDbOptional.get();
         userRepository.delete(user);
+        followService.setRefersDeletedUserInAllWhereFollowingIdOrFollowerId(user.getId(), true);
         return String.format("New user(id: %s, nickname: %s) has been deleted", user.getId(), user.getNickname());
-    }
-
-    private void reduceFollowingsExcludeFollowWithDeletedUsers(User user) {
-        user.setFollowings(user.getFollowings().stream().filter(f -> {
-            Optional<User> followingOptional = userRepository.findById(f.getFollowingId());
-            return followingOptional.isPresent() && followingOptional.get().getDeletedAt() == null;
-        }).collect(Collectors.toSet()));
-    }
-
-    private void reduceFollowersExcludeFollowWithDeletedUsers(User user) {
-        user.setFollowers(user.getFollowers().stream().filter(f -> {
-            Optional<User> followerOptional = userRepository.findById(f.getFollowerId());
-            return followerOptional.isPresent() && followerOptional.get().getDeletedAt() == null;
-        }).collect(Collectors.toSet()));
     }
 }
