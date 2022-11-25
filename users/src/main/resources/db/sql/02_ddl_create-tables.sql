@@ -36,21 +36,11 @@ ALTER TABLE users_scheme.users
     REFERENCES users_scheme.cities (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE RESTRICT;
-CREATE INDEX fki_users_current_city_id_fkey
-    ON users_scheme.users(current_city_id);
 ALTER TABLE users_scheme.users
     ADD CONSTRAINT users_gender_id_fkey FOREIGN KEY (gender_id)
     REFERENCES users_scheme.genders (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE RESTRICT;
-CREATE INDEX fki_users_gender_id_fkey
-    ON users_scheme.users(gender_id);
---ALTER TABLE users_scheme.users
---    ADD CONSTRAINT users_gender_id_fkey FOREIGN KEY (gender_id)
---    REFERENCES users_scheme.genders (id) MATCH SIMPLE
---    ON UPDATE NO ACTION
---    ON DELETE NO ACTION
---    NOT VALID;
 ALTER TABLE users_scheme.users
     ADD CONSTRAINT users_nickname_uniq UNIQUE (nickname);
 ALTER TABLE users_scheme.users
