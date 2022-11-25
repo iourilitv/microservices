@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,12 +16,18 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.util.Date;
 
+/**
+ * Used pattern Soft Delete for deletedAt field.
+ * Source "How to Implement Soft Delete in Spring JPA.": https://www.baeldung.com/spring-jpa-soft-delete
+ */
+
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 @Getter
 @EqualsAndHashCode
 @NoArgsConstructor
 @Entity
 @Table(name = "follows")
+@Where(clause = "refers_deleted_user = false")
 public class Follow {
 
     @Id
@@ -36,6 +43,9 @@ public class Follow {
     @Column(name = "followed_at", nullable = false)
     @Temporal(value = TemporalType.TIMESTAMP)
     private Date followedAt;
+
+    @Column(name = "refers_deleted_user")
+    private boolean refersDeletedUser;
 
     public Follow(Long followingId, Long followerId) {
         this.followingId = followingId;

@@ -1,7 +1,6 @@
 package com.example.microservices.users.service;
 
 import com.example.microservices.users.entity.Follow;
-import com.example.microservices.users.entity.User;
 import com.example.microservices.users.repository.FollowRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,9 +17,6 @@ import java.util.Optional;
 public class FollowService {
 
     private final FollowRepository followRepository;
-    private final UserService userService;
-
-    //TODO It's required to handle Soft Deleted User case for all get methods
 
     public List<Follow> getAll() {
         return (List<Follow>) followRepository.findAll();
@@ -48,22 +44,23 @@ public class FollowService {
         }
         follow.setFollowedAt(follow.getFollowedAt());
         Follow savedFollow = followRepository.save(follow);
-        User following = userService.getUser(follow.getFollowingId());
-        User follower = userService.getUser(follow.getFollowerId());
-        return String.format("User(id: %s, nickname: %s) has been followed to User(id: %s, nickname: %s) with Follow(id: %s)",
-                following.getId(), following.getNickname(), follower.getId(), follower.getNickname(), savedFollow.getId());
+        return String.format("User(id: %s) has been followed to User(id: %s) with Follow(id: %s)",
+                savedFollow.getFollowingId(), savedFollow.getFollowerId(), savedFollow.getId());
     }
 
     @Transactional
     public String deleteFollow(Long id) {
         Optional<Follow> existFollowOptional = followRepository.findById(id);
         if (existFollowOptional.isPresent()) {
-            User following = userService.getUser(existFollowOptional.get().getFollowingId());
-            User follower = userService.getUser(existFollowOptional.get().getFollowerId());
             followRepository.deleteById(id);
-            return String.format("User(id: %s, nickname: %s) has been followed to User(id: %s, nickname: %s) with Follow(id: %s)",
-                    following.getId(), following.getNickname(), follower.getId(), follower.getNickname(), existFollowOptional.get().getId());
+            Follow follow = existFollowOptional.get();
+            return String.format("User(id: %s) has been followed out from User(id: %s). The Follow(id: %s) has been deleted",
+                    follow.getFollowingId(), follow.getFollowerId(), follow.getId());
         }
         return String.format("There is no Follow to delete with id: %s", id);
+    }
+
+    public void setRefersDeletedUserInAllWhereFollowingIdOrFollowerId(Long userId, boolean flag) {
+        followRepository.setRefersDeletedUserInAllWhereFollowingIdOrFollowerId(userId, flag);
     }
 }
