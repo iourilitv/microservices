@@ -21,6 +21,7 @@ target/
 *.iml
 *.ipr
 .idea/dbnavigator.xml
+.idea/compiler.xml
 
 ### NetBeans ###
 /nbproject/private/
