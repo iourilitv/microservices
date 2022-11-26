@@ -1,6 +1,8 @@
 package com.example.microservices.users.controller;
 
+import com.example.microservices.users.dto.FollowDTO;
 import com.example.microservices.users.entity.Follow;
+import com.example.microservices.users.mapper.FollowMapper;
 import com.example.microservices.users.service.FollowService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,29 +21,31 @@ import java.util.List;
 public class FollowController {
 
     private final FollowService followService;
+    private final FollowMapper followMapper;
 
     @GetMapping
-    public List<Follow> getAll() {
-        return followService.getAll();
+    public List<FollowDTO> getAll() {
+        return followMapper.toDTOList(followService.getAll());
     }
 
     @GetMapping("/followings/{followerId}")
-    public List<Follow> getAllFollowings(@PathVariable Long followerId) {
-        return followService.getAllFollowings(followerId);
+    public List<FollowDTO> getAllFollowings(@PathVariable Long followerId) {
+        return followMapper.toDTOList(followService.getAllFollowings(followerId));
     }
 
     @GetMapping("/followers/{followingId}")
-    public List<Follow> getAllFollowers(@PathVariable Long followingId) {
-        return followService.getAllFollowers(followingId);
+    public List<FollowDTO> getAllFollowers(@PathVariable Long followingId) {
+        return followMapper.toDTOList(followService.getAllFollowers(followingId));
     }
 
     @GetMapping(value = "/{id}")
-    public Follow getFollow(@PathVariable long id) {
-        return followService.getFollow(id);
+    public FollowDTO getFollow(@PathVariable long id) {
+        return followMapper.toDTO(followService.getFollow(id));
     }
 
     @PostMapping
-    public String createFollow(@RequestBody Follow follow) {
+    public String createFollow(@RequestBody FollowDTO followDTO) {
+        Follow follow = followMapper.toEntity(followDTO);
         return followService.createFollow(follow);
     }
 

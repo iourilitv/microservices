@@ -1,7 +1,6 @@
 package com.example.microservices.users.entity;
 
 import com.example.microservices.users.enums.Gender;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -23,6 +22,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -30,7 +30,6 @@ import java.util.Set;
  * Source "How to Implement Soft Delete in Spring JPA.": https://www.baeldung.com/spring-jpa-soft-delete
  */
 
-@JsonInclude(value = JsonInclude.Include.NON_NULL)
 @Data
 @EqualsAndHashCode(exclude = {"followings", "followers"})
 @NoArgsConstructor
@@ -87,12 +86,12 @@ public class User {
     @OneToMany
     @JoinColumn(name = "follower_id", updatable = false)
     @OrderBy("id")
-    private Set<Follow> followings;
+    private Set<Follow> followings = new HashSet<>();
 
     @OneToMany
     @JoinColumn(name = "following_id", updatable = false)
     @OrderBy("id")
-    private Set<Follow> followers;
+    private Set<Follow> followers = new HashSet<>();
 
     public User(String firstName, String lastName, Gender gender, Date birthday, City currentCity, String nickname) {
         this.firstName = firstName;
@@ -101,5 +100,24 @@ public class User {
         this.birthday = birthday;
         this.currentCity = currentCity;
         this.nickname = nickname;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", secondName='" + secondName + '\'' +
+                ", gender=" + gender +
+                ", birthday=" + birthday +
+                ", currentCity=" + currentCity +
+                ", nickname='" + nickname + '\'' +
+                ", email='" + email + '\'' +
+                ", phone='" + phone + '\'' +
+                ", about='" + about + '\'' +
+                ", hardSkills='" + hardSkills + '\'' +
+                ", deletedAt=" + deletedAt +
+                '}';
     }
 }

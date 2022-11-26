@@ -1,6 +1,8 @@
 package com.example.microservices.users.controller;
 
+import com.example.microservices.users.dto.UserDTO;
 import com.example.microservices.users.entity.User;
+import com.example.microservices.users.mapper.UserMapper;
 import com.example.microservices.users.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,25 +25,28 @@ import java.util.Objects;
 public class UserController {
 
     private final UserService userService;
+    private final UserMapper userMapper;
 
     @GetMapping
-    public List<User> getAll() {
-        return userService.getAll();
+    public List<UserDTO> getAll() {
+        return userMapper.toDTOList(userService.getAll());
     }
 
     @GetMapping(value = "/{id}")
-    public User getUser(@PathVariable long id) {
-        return userService.getUser(id);
+    public UserDTO getUser(@PathVariable long id) {
+        return userMapper.toDTO(userService.getUser(id));
     }
 
     @PutMapping(value = "/{id}")
-    public String updateUser(@RequestBody User user, @PathVariable Long id) {
+    public String updateUser(@RequestBody UserDTO userDTO, @PathVariable Long id) {
+        User user = userMapper.toEntity(userDTO);
         validateUserWithId(user, id);
         return userService.updateUser(user);
     }
 
     @PostMapping
-    public String createUser(@RequestBody User user) {
+    public String createUser(@RequestBody UserDTO userDTO) {
+        User user = userMapper.toEntity(userDTO);
         return userService.createUser(user);
     }
 
