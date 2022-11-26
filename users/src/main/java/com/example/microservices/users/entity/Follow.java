@@ -1,9 +1,9 @@
 package com.example.microservices.users.entity;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.Column;
@@ -21,7 +21,7 @@ import java.util.Date;
  * Source "How to Implement Soft Delete in Spring JPA.": https://www.baeldung.com/spring-jpa-soft-delete
  */
 
-@JsonInclude(value = JsonInclude.Include.NON_NULL)
+@ToString
 @Getter
 @EqualsAndHashCode
 @NoArgsConstructor
