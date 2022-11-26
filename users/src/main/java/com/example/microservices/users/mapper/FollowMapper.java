@@ -13,7 +13,7 @@ public interface FollowMapper {
 
     FollowDTO toDTO(Follow entity);
 
-    Follow foEntity(FollowDTO dto);
+    Follow toEntity(FollowDTO dto);
 
     List<FollowDTO> toDTOList(List<Follow> entityList);
 
