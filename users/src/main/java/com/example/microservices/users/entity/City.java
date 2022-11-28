@@ -1,5 +1,6 @@
 package com.example.microservices.users.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -16,6 +17,7 @@ import javax.persistence.Table;
 @Data
 @EqualsAndHashCode
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "cities")
 public class City {

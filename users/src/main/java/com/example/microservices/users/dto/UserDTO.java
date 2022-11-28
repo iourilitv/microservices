@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.util.Date;
@@ -12,6 +13,7 @@ import java.util.Date;
 @ToString
 @Data
 @EqualsAndHashCode
+@NoArgsConstructor
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 public class UserDTO {
 
@@ -49,4 +51,12 @@ public class UserDTO {
 
     private Integer followersNumber;
 
+    public UserDTO(String firstName, String lastName, Gender gender, Date birthday, CityDTO currentCity, String nickname) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.gender = gender;
+        this.birthday = birthday;
+        this.currentCity = currentCity;
+        this.nickname = nickname;
+    }
 }

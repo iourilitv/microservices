@@ -42,7 +42,7 @@ public class UserService {
     @Transactional
     public String deleteUser(Long id) {
         Optional<User> userInDbOptional = userRepository.findById(id);
-        if (userInDbOptional.isEmpty() || userInDbOptional.get().getDeletedAt() != null) {
+        if (userInDbOptional.isEmpty() || userInDbOptional.get().isDeleted()) {
             throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED);
         }
         User user = userInDbOptional.get();

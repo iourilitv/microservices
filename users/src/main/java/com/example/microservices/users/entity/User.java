@@ -1,9 +1,11 @@
 package com.example.microservices.users.entity;
 
 import com.example.microservices.users.enums.Gender;
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -19,8 +21,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -35,14 +35,14 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 @Table(name = "users")
-@SQLDelete(sql = "UPDATE users SET deleted_at = now() WHERE id = ?")
-@Where(clause = "deleted_at is NULL")
+@SQLDelete(sql = "UPDATE users SET is_deleted = true WHERE id = ?")
+@Where(clause = "is_deleted = false")
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    private @Setter(AccessLevel.NONE) Long id;
 
     @Column(name = "first_name", nullable = false)
     private String firstName;
@@ -64,8 +64,8 @@ public class User {
     @JoinColumn(name = "current_city_id", nullable = false)
     private City currentCity;
 
-    @Column(name = "nickname", nullable = false)
-    private String nickname;
+    @Column(name = "nickname", nullable = false, updatable = false)
+    private @Setter(AccessLevel.NONE) String nickname;
 
     @Column(name = "email")
     private String email;
@@ -79,9 +79,8 @@ public class User {
     @Column(name = "hard_skills")
     private String hardSkills;
 
-    @Column(name = "deleted_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date deletedAt;
+    @Column(name = "isDeleted")
+    private boolean isDeleted;
 
     @OneToMany
     @JoinColumn(name = "follower_id", updatable = false)
@@ -92,6 +91,10 @@ public class User {
     @JoinColumn(name = "following_id", updatable = false)
     @OrderBy("id")
     private Set<Follow> followers = new HashSet<>();
+
+    public User(String nickname) {
+        this.nickname = nickname;
+    }
 
     public User(String firstName, String lastName, Gender gender, Date birthday, City currentCity, String nickname) {
         this.firstName = firstName;
@@ -117,7 +120,7 @@ public class User {
                 ", phone='" + phone + '\'' +
                 ", about='" + about + '\'' +
                 ", hardSkills='" + hardSkills + '\'' +
-                ", deletedAt=" + deletedAt +
+                ", isDeleted=" + isDeleted +
                 '}';
     }
 }
