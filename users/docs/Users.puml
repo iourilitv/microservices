@@ -23,7 +23,7 @@ class User {
     +phone: String
     +about: String
     +hardSkills: String
-    +deletedAt: Date
+    +isDeleted: boolean
     +followings: Set<Follow>
     +followers: Set<Follow>
 }
