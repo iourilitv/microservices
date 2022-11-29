@@ -2,6 +2,7 @@ package com.example.microservices.users.mapper;
 
 import com.example.microservices.users.dto.FollowDTO;
 import com.example.microservices.users.entity.Follow;
+import com.example.microservices.users.util.FollowTestUtils.TestFollow;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -17,7 +18,7 @@ class FollowMapperTest {
 
     @Test
     void test1_givenEntity_thenCorrect_toDTO() {
-        Follow follow = new testFollow(10L, 1L, 2L);
+        Follow follow = new TestFollow(10L, 1L, 2L);
         FollowDTO followDTO = followMapper.toDTO(follow);
         assertEntityToDto(follow, followDTO);
     }
@@ -32,7 +33,7 @@ class FollowMapperTest {
     @Test
     void givenEntityList_thenCorrect_toDTOList() {
         for (int i = 0; i < 5; i++) {
-            Follow follow = new testFollow(10L + 1, 1L + i, 2L + i);
+            Follow follow = new TestFollow(10L + 1, 1L + i, 2L + i);
             FollowDTO followDTO = followMapper.toDTO(follow);
             assertEntityToDto(follow, followDTO);
         }
@@ -60,19 +61,5 @@ class FollowMapperTest {
         assertEquals(followDTO.getFollowingId(), follow.getFollowingId());
         assertEquals(followDTO.getFollowerId(), follow.getFollowerId());
         assertNotNull(follow.getFollowedAt());
-    }
-
-    private static class testFollow extends Follow {
-        private final Long id;
-
-        testFollow(Long id, Long followingId, Long followerId) {
-            super(followingId, followerId);
-            this.id = id;
-        }
-
-        @Override
-        public Long getId() {
-            return this.id;
-        }
     }
 }
