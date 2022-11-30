@@ -20,7 +20,7 @@ public abstract class UserMapper {
     //It only works together the same named abstract method
     //Source: https://github.com/mapstruct/mapstruct/issues/73#issuecomment-548438210
     public final User toEntity(final UserDTO userDTO) {
-        return toEntity(userDTO, new User(userDTO.getNickname()));
+        return toEntity(userDTO, new User(userDTO.getId(), userDTO.getNickname()));
     }
 
     public abstract List<UserDTO> toDTOList(List<User> entityList);
