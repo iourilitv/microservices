@@ -92,7 +92,8 @@ public class User {
     @OrderBy("id")
     private Set<Follow> followers = new HashSet<>();
 
-    public User(String nickname) {
+    public User(Long id, String nickname) {
+        this.id = id;
         this.nickname = nickname;
     }
 

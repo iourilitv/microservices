@@ -1,131 +1,70 @@
 package com.example.microservices.users.mapper;
 
-import com.example.microservices.users.dto.CityDTO;
 import com.example.microservices.users.dto.UserDTO;
-import com.example.microservices.users.entity.City;
-import com.example.microservices.users.entity.Follow;
 import com.example.microservices.users.entity.User;
-import com.example.microservices.users.enums.Gender;
+import com.example.microservices.users.util.UserTestUtils;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.mapstruct.factory.Mappers;
 
-import java.util.Date;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import static com.example.microservices.users.util.UserTestUtils.fillUpTestUsers;
+import static com.example.microservices.users.util.UserTestUtils.toUserDTO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
+@TestMethodOrder(value = MethodOrderer.MethodName.class)
 class UserMapperTest {
+    private static final int TEST_LIST_SIZE = 10;
 
     CityMapper cityMapper = Mappers.getMapper(CityMapper.class);
     UserMapper userMapper = new UserMapperImpl(cityMapper);
 
+    private final List<User> testUsers = new ArrayList<>(TEST_LIST_SIZE);
+
+    @BeforeEach
+    void setUp() {
+        fillUpTestUsers(TEST_LIST_SIZE, testUsers);
+    }
+
+    @AfterEach
+    void tearDown() {
+        testUsers.clear();
+    }
+
     @Test
     void test1_givenEntity_thenCorrect_toDTO() {
-        User user = createTestUser(1);
-        UserDTO userDTO = userMapper.toDTO(user);
-        assertEntityToDTO(user, userDTO);
+        User user = testUsers.get(0);
+        UserDTO expectedDTO = toUserDTO(user);
+        UserDTO actualDTO = userMapper.toDTO(user);
+        assertEquals(expectedDTO, actualDTO);
     }
 
     @Test
     void test2_givenDTO_thenCorrect_toEntity() {
-        UserDTO userDTO = createTestUserDTO(1);
-        User user = userMapper.toEntity(userDTO);
-        assertDTOtoEntity(userDTO, user);
+        User expected = testUsers.get(0);
+        UserDTO userDTO = toUserDTO(expected);
+        User actual = userMapper.toEntity(userDTO);
+        assertEquals(expected, actual);
     }
 
     @Test
     void test3_givenEntityList_thenCorrect_toDTOList() {
-        for (int i = 0; i < 5; i++) {
-            User user = createTestUser(i);
-            UserDTO userDTO = userMapper.toDTO(user);
-            assertEntityToDTO(user, userDTO);
-        }
+        List<UserDTO> expectedList = testUsers.stream().map(UserTestUtils::toUserDTO).collect(Collectors.toList());
+        List<UserDTO> actualList = userMapper.toDTOList(testUsers);
+        assertIterableEquals(expectedList, actualList);
     }
 
     @Test
-    void test4_givenEntityList_thenCorrect_toEntityList() {
-        for (int i = 0; i < 5; i++) {
-            UserDTO userDTO = createTestUserDTO(i);
-            User user = userMapper.toEntity(userDTO);
-            assertDTOtoEntity(userDTO, user);
-        }
-    }
-
-    private User createTestUser(int index) {
-        Long userId = 10L + index;
-        User user = new TestUser(
-                userId,
-                "test_firstName" + index,
-                "test_lastName" + index,
-                Gender.values()[index % Gender.values().length],
-                new Date(),
-                new City(100 + index, "test_cityName" + 100 + index),
-                "my_nick_name" + index);
-        user.setEmail("testEmail@mail.com" + index);
-        user.setPhone("+7(999) 999-9999" + index);
-        user.setAbout("Test About" + index);
-        user.setHardSkills("Test Hard Skills" + index);
-        user.setFollowings(Set.of(new Follow(1L, userId)));
-        user.setFollowers(Set.of(new Follow(userId, 4L), new Follow(userId, 2L)));
-        return user;
-    }
-
-    private UserDTO createTestUserDTO(int index) {
-        UserDTO userDTO = new UserDTO(
-                "test_firstName" + index,
-                "test_lastName" + index,
-                Gender.values()[index % Gender.values().length],
-                new Date(),
-                new CityDTO(100 + index),
-                "my_nick_name" + index);
-        userDTO.setEmail("testEmail@mail.com" + index);
-        userDTO.setPhone("+7(999) 999-9999" + index);
-        userDTO.setAbout("Test About" + index);
-        userDTO.setHardSkills("Test Hard Skills" + index);
-        return userDTO;
-    }
-
-    private void assertEntityToDTO(User user, UserDTO userDTO) {
-        assertEquals(user.getId(), userDTO.getId());
-        assertEquals(user.getFirstName(), userDTO.getFirstName());
-        assertEquals(user.getLastName(), userDTO.getLastName());
-        assertEquals(user.getGender(), userDTO.getGender());
-        assertEquals(user.getBirthday(), userDTO.getBirthday());
-        assertEquals(user.getCurrentCity().getId(), userDTO.getCurrentCity().getId());
-        assertEquals(user.getNickname(), userDTO.getNickname());
-        assertEquals(user.getEmail(), userDTO.getEmail());
-        assertEquals(user.getPhone(), userDTO.getPhone());
-        assertEquals(user.getAbout(), user.getAbout());
-        assertEquals(user.getHardSkills(), userDTO.getHardSkills());
-        assertEquals(user.getFollowings().size(), userDTO.getFollowingsNumber());
-        assertEquals(user.getFollowers().size(), userDTO.getFollowersNumber());
-    }
-
-    private void assertDTOtoEntity(UserDTO userDTO, User user) {
-        assertEquals(userDTO.getId(), user.getId());
-        assertEquals(userDTO.getFirstName(), user.getFirstName());
-        assertEquals(userDTO.getLastName(), user.getLastName());
-        assertEquals(userDTO.getGender(), user.getGender());
-        assertEquals(userDTO.getBirthday(), user.getBirthday());
-        assertEquals(userDTO.getCurrentCity().getId(), user.getCurrentCity().getId());
-        assertEquals(userDTO.getNickname(), user.getNickname());
-        assertEquals(userDTO.getEmail(), user.getEmail());
-        assertEquals(userDTO.getPhone(), user.getPhone());
-        assertEquals(userDTO.getAbout(), user.getAbout());
-        assertEquals(userDTO.getHardSkills(), user.getHardSkills());
-    }
-
-    private static class TestUser extends User {
-        private final Long id;
-
-        public TestUser(Long id, String firstName, String lastName, Gender gender, Date birthday, City currentCity, String nickname) {
-            super(firstName, lastName, gender, birthday, currentCity, nickname);
-            this.id = id;
-        }
-
-        @Override
-        public Long getId() {
-            return this.id;
-        }
+    void test4_givenDTOList_thenCorrect_toEntityList() {
+        List<UserDTO> dtoList = testUsers.stream().map(UserTestUtils::toUserDTO).collect(Collectors.toList());
+        List<User> actualList = userMapper.toEntityList(dtoList);
+        assertIterableEquals(testUsers, actualList);
     }
 }

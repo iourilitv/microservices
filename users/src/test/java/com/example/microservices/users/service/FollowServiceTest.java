@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 
 @TestMethodOrder(value = MethodOrderer.MethodName.class)
 class FollowServiceTest {
+    private static final int TEST_LIST_SIZE = 10;
 
     private final FollowRepository repository = mock(FollowRepository.class);
     private final FollowService service = new FollowService(repository);
@@ -35,7 +36,7 @@ class FollowServiceTest {
 
     @BeforeEach
     void setUp() {
-        fillUpTestFollows(10, testFollows);
+        fillUpTestFollows(TEST_LIST_SIZE, testFollows);
     }
 
     @AfterEach
