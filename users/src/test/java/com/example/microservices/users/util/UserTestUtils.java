@@ -54,6 +54,17 @@ public class UserTestUtils {
         return user;
     }
 
+    public static User createTestUser(int index, City currentCity) {
+        User user = new User("test_firstName" + index, "test_lastName" + index, Gender.values()[index % Gender.values().length],
+                new Date(), currentCity, "my_nick_name" + index);
+        user.setSecondName("test_secondName" + index);
+        user.setEmail(index + "testEmail@mail.com");
+        user.setPhone("+7(999) 999-" + StringUtils.leftPad(String.valueOf(index), 4, "0"));
+        user.setAbout("Test About" + index);
+        user.setHardSkills("Test Hard Skills" + index);
+        return user;
+    }
+
     public static UserDTO toUserDTO(User user) {
         UserDTO userDTO = new UserDTO(user.getFirstName(), user.getLastName(), user.getGender(), user.getBirthday(),
                 new CityDTO(user.getCurrentCity().getId(), user.getCurrentCity().getName()), user.getNickname());
