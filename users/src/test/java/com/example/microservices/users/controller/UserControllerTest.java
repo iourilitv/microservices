@@ -162,7 +162,7 @@ class UserControllerTest {
 
     @Test
     void test42_givenExistUser_thenError_createUser() throws Exception {
-        HttpStatus expectedHttpStatus = HttpStatus.UNPROCESSABLE_ENTITY;
+        HttpStatus expectedHttpStatus = HttpStatus.PRECONDITION_FAILED;
         User userToCreate = testUsers.get(0);
         UserDTO userDTO = toUserDTO(userToCreate);
         userDTO.setId(null);
