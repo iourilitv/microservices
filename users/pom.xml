@@ -20,6 +20,10 @@
 		<mapstruct.version>1.5.3.Final</mapstruct.version>
 		<maven-compiler-plugin.lombok-mapstruct-binding.version>0.2.0</maven-compiler-plugin.lombok-mapstruct-binding.version>
 		<maven-compiler-plugin.lombok.version>1.18.24</maven-compiler-plugin.lombok.version>
+		<maven-surefire-plugin.version>3.0.0-M7</maven-surefire-plugin.version>
+		<maven-surefire-report-plugin.version>3.0.0-M7</maven-surefire-report-plugin.version>
+		<maven-failsafe-plugin.version>3.0.0-M7</maven-failsafe-plugin.version>
+		<build-helper-maven-plugin.version>3.3.0</build-helper-maven-plugin.version>
 	</properties>
 
 	<dependencies>
@@ -67,6 +71,60 @@
 		</dependency>
 	</dependencies>
 
+	<profiles>
+		<profile>
+			<id>integration-test</id>
+			<properties>
+				<!-- Only integration tests are run when the integration-test profile is active -->
+				<skip.integration.tests>false</skip.integration.tests>
+				<skip.unit.tests>true</skip.unit.tests>
+			</properties>
+			<build>
+				<!-- To build with only tests named ITest* executing, use the following command line: mvn verify -Pintegration-test -->
+				<plugins>
+					<plugin>
+						<!-- https://maven.apache.org/surefire/maven-surefire-plugin/examples/inclusion-exclusion.html -->
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>${maven-surefire-plugin.version}</version>
+						<configuration>
+							<skipTests>${skip.unit.tests}</skipTests>
+						</configuration>
+					</plugin>
+					<plugin>
+						<!-- https://maven.apache.org/surefire/maven-surefire-report-plugin/ -->
+						<!-- The reports of test results are located in target/failsafe-reports directory -->
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-report-plugin</artifactId>
+						<version>${maven-surefire-report-plugin.version}</version>
+					</plugin>
+					<plugin>
+						<!-- https://maven.apache.org/surefire/maven-failsafe-plugin/examples/inclusion-exclusion.html -->
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<version>${maven-failsafe-plugin.version}</version>
+						<configuration>
+							<skipTests>${skip.integration.tests}</skipTests>
+							<excludes>
+								<!--TODO Complete the test and remove it -->
+								<exclude>**/ITestFollowController.java</exclude>
+							</excludes>
+						</configuration>
+						<executions>
+							<execution>
+								<id>integration-tests</id>
+								<goals>
+									<goal>integration-test</goal>
+									<goal>verify</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -78,6 +136,19 @@
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
 						</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<!-- No needed(exists as default) if no unit tests to exclude -->
+				<!-- https://maven.apache.org/surefire/maven-surefire-plugin/examples/inclusion-exclusion.html -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${maven-surefire-plugin.version}</version>
+				<configuration>
+					<excludes>
+						<!--TODO Complete the test and remove it -->
+						<exclude>**/FollowControllerTest.java</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
@@ -106,6 +177,40 @@
 						</path>
 					</annotationProcessorPaths>
 				</configuration>
+			</plugin>
+			<plugin>
+				<!-- Integration tests directory: src/integration-test/java -->
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>${build-helper-maven-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>add-integration-test-source</id>
+						<phase>generate-test-sources</phase>
+						<goals>
+							<goal>add-test-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>src/integration-test/java</source>
+							</sources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>add-integration-test-resource</id>
+						<phase>generate-test-resources</phase>
+						<goals>
+							<goal>add-test-resource</goal>
+						</goals>
+						<configuration>
+							<resources>
+								<resource>
+									<directory>src/integration-test/resources</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
