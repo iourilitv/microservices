@@ -3,6 +3,7 @@ package com.example.microservices.users.dto;
 import com.example.microservices.users.enums.Gender;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -10,6 +11,23 @@ import lombok.ToString;
 
 import java.util.Date;
 
+@Schema(description = "Public data of User", example = "{\n" +
+        "  \"id\": 1,\n" +
+        "  \"firstName\": \"Yury\",\n" +
+        "  \"lastName\": \"Petrov\",\n" +
+        "  \"secondName\": \"UpdatedStakanych\",\n" +
+        "  \"gender\": \"MALE\",\n" +
+        "  \"birthday\": \"2000-11-22T00:00:00.000+00:00\",\n" +
+        "  \"currentCity\": {\n" +
+        "    \"id\": 1,\n" +
+        "    \"name\": \"Moscow\"\n" +
+        "  },\n" +
+        "  \"nickname\": \"iuric\",\n" +
+        "  \"email\": \"y.petrov@mail.com\",\n" +
+        "  \"phone\": \"+7(999)123-4567\",\n" +
+        "  \"followingsNumber\": 2,\n" +
+        "  \"followersNumber\": 1\n" +
+        "}")
 @ToString
 @Data
 @EqualsAndHashCode
