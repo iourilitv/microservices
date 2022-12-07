@@ -1,5 +1,6 @@
-package com.example.microservices.users;
+package com.example.microservices.users.controller;
 
+import com.example.microservices.users.UsersApplication;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;

@@ -48,6 +48,6 @@ public class UserService {
         User user = userInDbOptional.get();
         userRepository.delete(user);
         followService.setRefersDeletedUserInAllWhereFollowingIdOrFollowerId(user.getId(), true);
-        return String.format("New user(id: %s, nickname: %s) has been deleted", user.getId(), user.getNickname());
+        return String.format("User(id: %s, nickname: %s) has been deleted", user.getId(), user.getNickname());
     }
 }

@@ -166,7 +166,7 @@ class ITestUserController {
     @Test
     void test51_givenExistAndUndeletedUser_thenCorrect_deleteUser() throws Exception {
         User userToDelete = testUsers.get(0);
-        String expected = String.format("New user(id: %s, nickname: %s) has been deleted", userToDelete.getId(), userToDelete.getNickname());
+        String expected = String.format("User(id: %s, nickname: %s) has been deleted", userToDelete.getId(), userToDelete.getNickname());
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete("/users/{id}", userToDelete.getId())
                 .contentType(MediaType.APPLICATION_JSON)).andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();

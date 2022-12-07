@@ -40,6 +40,11 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-ui</artifactId>
+			<version>1.6.13</version>
+		</dependency>
+		<dependency>
 			<groupId>org.mapstruct</groupId>
 			<artifactId>mapstruct</artifactId>
 			<version>${mapstruct.version}</version>
@@ -83,6 +88,44 @@
 				<!-- To build with only tests named ITest* executing, use the following command line: mvn verify -Pintegration-test -->
 				<plugins>
 					<plugin>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-maven-plugin</artifactId>
+						<version>2.7.6</version>
+						<executions>
+							<execution>
+								<id>pre-integration-test</id>
+								<goals>
+									<goal>start</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>post-integration-test</id>
+								<goals>
+									<goal>stop</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.springdoc</groupId>
+						<artifactId>springdoc-openapi-maven-plugin</artifactId>
+						<version>1.4</version>
+						<executions>
+							<execution>
+								<phase>integration-test</phase>
+								<goals>
+									<goal>generate</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<!-- These default values have been override in application.properties -->
+<!--							<apiDocsUrl>http://localhost:8080/v3/api-docs</apiDocsUrl>-->
+<!--							<outputFileName>openapi.json</outputFileName>-->
+<!--							<outputDir>${project.build.directory}</outputDir>-->
+						</configuration>
+					</plugin>
+					<plugin>
 						<!-- https://maven.apache.org/surefire/maven-surefire-plugin/examples/inclusion-exclusion.html -->
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-surefire-plugin</artifactId>
@@ -112,7 +155,7 @@
 						</configuration>
 						<executions>
 							<execution>
-								<id>integration-tests</id>
+								<id>integration-test</id>
 								<goals>
 									<goal>integration-test</goal>
 									<goal>verify</goal>
@@ -130,6 +173,7 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>2.7.6</version>
 				<configuration>
 					<excludes>
 						<exclude>
@@ -208,6 +252,26 @@
 									<directory>src/integration-test/resources</directory>
 								</resource>
 							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<!-- This was not used here but could be useful in the future -->
+				<!-- https://stackoverflow.com/questions/43169637/how-to-reuse-properties-from-application-properties-spring-boot-in-maven-pom-x -->
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>properties-maven-plugin</artifactId>
+				<version>1.1.0</version>
+				<executions>
+					<execution>
+						<phase>initialize</phase>
+						<goals>
+							<goal>read-project-properties</goal>
+						</goals>
+						<configuration>
+							<files>
+								<file>${basedir}/src/main/resources/application.properties</file>
+							</files>
 						</configuration>
 					</execution>
 				</executions>
