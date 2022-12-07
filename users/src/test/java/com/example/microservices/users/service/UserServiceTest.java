@@ -128,7 +128,7 @@ class UserServiceTest {
         when(repository.findById(user.getId())).thenReturn(Optional.of(user));
         doNothing().when(repository).delete(user);
         doNothing().when(followService).setRefersDeletedUserInAllWhereFollowingIdOrFollowerId(user.getId(), true);
-        String expected = String.format("New user(id: %s, nickname: %s) has been deleted", user.getId(), user.getNickname());
+        String expected = String.format("User(id: %s, nickname: %s) has been deleted", user.getId(), user.getNickname());
         String actual = service.deleteUser(user.getId());
         assertEquals(expected, actual);
     }
