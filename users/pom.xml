@@ -24,6 +24,7 @@
 		<maven-surefire-report-plugin.version>3.0.0-M7</maven-surefire-report-plugin.version>
 		<maven-failsafe-plugin.version>3.0.0-M7</maven-failsafe-plugin.version>
 		<build-helper-maven-plugin.version>3.3.0</build-helper-maven-plugin.version>
+		<liquibase-maven-plugin.propertyFile>${project.basedir}/liquibase.properties</liquibase-maven-plugin.propertyFile>
 	</properties>
 
 	<dependencies>
@@ -49,11 +50,10 @@
 			<artifactId>mapstruct</artifactId>
 			<version>${mapstruct.version}</version>
 		</dependency>
-		<!--		<dependency>-->
-<!--			<groupId>org.liquibase</groupId>-->
-<!--			<artifactId>liquibase-core</artifactId>-->
-<!--		</dependency>-->
-
+		<dependency>
+			<groupId>org.liquibase</groupId>
+			<artifactId>liquibase-core</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
@@ -77,6 +77,24 @@
 	</dependencies>
 
 	<profiles>
+		<profile>
+			<id>liquibase</id>
+			<build>
+				<plugins>
+					<plugin>
+						<!-- Source of example: https://docs.liquibase.com/tools-integrations/maven/using-liquibase-and-maven-pom-file.html -->
+						<groupId>org.liquibase</groupId>
+						<artifactId>liquibase-maven-plugin</artifactId>
+						<configuration>
+							<!-- !!! It's strictly required to add @PropertySource(value = "classpath:liquibase.properties".. (see LiquibaseProfileConfig) -->
+							<!-- That's because in this project some datasource properties are located in private.properties file -->
+							<propertyFileWillOverride>true</propertyFileWillOverride>
+							<propertyFile>${liquibase-maven-plugin.propertyFile}</propertyFile>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 		<profile>
 			<id>integration-test</id>
 			<properties>
