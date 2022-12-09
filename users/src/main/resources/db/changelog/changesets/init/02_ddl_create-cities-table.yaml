@@ -1,0 +1,30 @@
+databaseChangeLog:
+  - changeSet:
+      id: 02_ddl_create-cities-table
+      author: Iuriy Litvinenko
+      comment: Creating cities table
+      preConditions:
+        - onFail: MARK_RAN
+        - onFailMessage: Table cities already exists
+        - not:
+          - tableExists:
+              tableName: cities
+      changes:
+        - createTable:
+            tableName: cities
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: cities_pkey
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: cities_name_uniq

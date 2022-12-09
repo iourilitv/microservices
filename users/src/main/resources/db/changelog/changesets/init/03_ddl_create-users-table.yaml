@@ -1,0 +1,139 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: 03-1_ddl_create-users-table
+      author: Iuriy Litvinenko
+      comment: Creating users table
+      preConditions:
+        - onFail: MARK_RAN
+        - onFailMessage: Table users already exists
+        - not:
+          - tableExists:
+              tableName: users
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: users_pkey
+                    nullable: false
+              - column:
+                  name: first_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: second_name
+                  type: varchar(255)
+              - column:
+                  name: gender_id
+                  type: smallint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: users_gender_id_fkey
+                    referencedTableName: genders
+                    referencedColumnNames: id
+              - column:
+                  name: birthday
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: current_city_id
+                  type: int
+                  constraints:
+                    nullable: false
+                    foreignKeyName: users_current_city_id_fkey
+                    referencedTableName: cities
+                    referencedColumnNames: id
+              - column:
+                  name: nickname
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: users_nickname_uniq
+              - column:
+                  name: email
+                  type: varchar(255)
+              - column:
+                  name: phone
+                  type: varchar(255)
+              - column:
+                  name: about
+                  type: text
+              - column:
+                  name: hard_skills
+                  type: text
+              - column:
+                  name: is_deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 03-2_ddl_create-users-table
+      author: Iuriy Litvinenko
+      comment: Creating fki_users_current_city_id_fkey
+      preConditions:
+        - onFail: MARK_RAN
+        - onFailMessage: Index fki_users_current_city_id_fkey already exists
+        - not:
+          - indexExists:
+              indexName: fki_users_current_city_id_fkey
+      changes:
+        - createIndex:
+            tableName: users
+            indexName: fki_users_current_city_id_fkey
+            columns:
+              - column:
+                  name: current_city_id
+
+  - changeSet:
+      id: 03-3_ddl_create-users-table
+      author: Iuriy Litvinenko
+      comment: Creating fki_users_gender_id_fkey
+      preConditions:
+        - onFail: MARK_RAN
+        - onFailMessage: Index fki_users_gender_id_fkey already exists
+        - not:
+          - indexExists:
+              indexName: fki_users_gender_id_fkey
+      changes:
+        - createIndex:
+            tableName: users
+            indexName: fki_users_gender_id_fkey
+            columns:
+              - column:
+                  name: gender_id
+
+  - changeSet:
+      id: 03-4_ddl_create-users-table
+      author: Iuriy Litvinenko
+      comment: Creating i_users_gender_id_and_current_city_id
+      preConditions:
+        - onFail: MARK_RAN
+        - onFailMessage: Index i_users_gender_id_and_current_city_id already exists
+        - not:
+          - indexExists:
+              indexName: i_users_gender_id_and_current_city_id
+      changes:
+        - createIndex:
+            tableName: users
+            indexName: i_users_gender_id_and_current_city_id
+            columns:
+              - column:
+                  name: gender_id
+              - column:
+                  name: current_city_id

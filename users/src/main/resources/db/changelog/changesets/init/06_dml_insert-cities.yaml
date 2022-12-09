@@ -1,0 +1,51 @@
+databaseChangeLog:
+  - changeSet:
+      id: 06_dml_insert-cities
+      author: Iuriy Litvinenko
+      comment: Inserting data into cities table
+      preConditions:
+        - onFail: MARK_RAN
+        - onFailMessage: Table cities doesn't exist or not empty
+        - and:
+          - tableExists:
+              tableName: cities
+          - sqlCheck:
+              expectedResult: 0
+              sql: select count(*) from cities
+      changes:
+        - insert:
+            tableName: cities
+            columns:
+              - column:
+                  name: name
+                  value: 'Moscow'
+        - insert:
+            tableName: cities
+            columns:
+              - column:
+                  name: name
+                  value: 'Samara'
+        - insert:
+            tableName: cities
+            columns:
+              - column:
+                  name: name
+                  value: 'Rome'
+        - insert:
+            tableName: cities
+            columns:
+              - column:
+                  name: name
+                  value: 'Paris'
+        - insert:
+            tableName: cities
+            columns:
+              - column:
+                  name: name
+                  value: 'Tula'
+        - insert:
+            tableName: cities
+            columns:
+              - column:
+                  name: name
+                  value: 'Minsk'
