@@ -1,0 +1,71 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: 04-1_ddl_create-follows-table
+      author: Iuriy Litvinenko
+      comment: Creating follows table
+      preConditions:
+        - onFail: MARK_RAN
+        - onFailMessage: Table follows already exists
+        - not:
+          - tableExists:
+              tableName: follows
+      changes:
+        - createTable:
+            tableName: follows
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: follows_pkey
+                    nullable: false
+              - column:
+                  name: following_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: follows_following_id_fkey
+                    referencedTableName: users
+                    referencedColumnNames: id
+              - column:
+                  name: follower_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: follows_follower_id_fkey
+                    referencedTableName: users
+                    referencedColumnNames: id
+              - column:
+                  name: followed_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: refers_deleted_user
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 04-2_ddl_create-follows-table
+      author: Iuriy Litvinenko
+      comment: Creating i_follows_following_id_and_follower_id
+      preConditions:
+        - onFail: MARK_RAN
+        - onFailMessage: Index i_follows_following_id_and_follower_id already exists
+        - not:
+          - indexExists:
+              indexName: i_follows_following_id_and_follower_id
+      changes:
+        - createIndex:
+            tableName: follows
+            indexName: i_follows_following_id_and_follower_id
+            columns:
+              - column:
+                  name: following_id
+              - column:
+                  name: follower_id

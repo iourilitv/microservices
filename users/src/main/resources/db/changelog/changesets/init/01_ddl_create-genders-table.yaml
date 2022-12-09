@@ -1,0 +1,32 @@
+databaseChangeLog:
+  - changeSet:
+      id: 01_ddl_create-genders-table
+      author: Iuriy Litvinenko
+      comment: Creating genders table
+      preConditions:
+        - onFail: MARK_RAN
+        - onFailMessage: Table genders already exists
+        - not:
+          - tableExists:
+              tableName: genders
+      changes:
+        - createTable:
+            tableName: genders
+            columns:
+              - column:
+                  name: id
+                  type: smallint
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: genders_pkey
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: genders_name_uniq
+              - column:
+                  name: description
+                  type: text
