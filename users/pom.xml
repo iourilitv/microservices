@@ -78,24 +78,6 @@
 
 	<profiles>
 		<profile>
-			<id>liquibase</id>
-			<build>
-				<plugins>
-					<plugin>
-						<!-- Source of example: https://docs.liquibase.com/tools-integrations/maven/using-liquibase-and-maven-pom-file.html -->
-						<groupId>org.liquibase</groupId>
-						<artifactId>liquibase-maven-plugin</artifactId>
-						<configuration>
-							<!-- !!! It's strictly required to add @PropertySource(value = "classpath:liquibase.properties".. (see LiquibaseProfileConfig) -->
-							<!-- That's because in this project some datasource properties are located in private.properties file -->
-							<propertyFileWillOverride>true</propertyFileWillOverride>
-							<propertyFile>${liquibase-maven-plugin.propertyFile}</propertyFile>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
 			<id>integration-test</id>
 			<properties>
 				<!-- Only integration tests are run when the integration-test profile is active -->
