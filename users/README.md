@@ -34,6 +34,10 @@ Add instructions to configue example-ishop-spring app
 Add instructions to run example-ishop-spring app
 ```
 
+## DevOps
+### Docker containers using instructions is located at devops/docker.md
+
+
 ## Should be added
 ### 1. DB Audit
 В сущности добавить поля, сохраняющие информацию о создании и последнем обновлении сущности.
