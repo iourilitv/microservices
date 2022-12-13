@@ -5,7 +5,7 @@ services:
     build:
       context: ./
     ports:
-      - "9010:9010"
+      - "8001:8080"
     depends_on:
       - postgres-db-compose
     environment:
@@ -26,14 +26,3 @@ services:
       POSTGRES_PASSWORD: microuser
       PGDATA: /var/lib/postgresql/data/pgdata
     restart: unless-stopped
-
-  pgadmin-compose:
-    image: dpage/pgadmin4:6.9
-    ports:
-      - "8888:80"
-    environment:
-      PGADMIN_DEFAULT_EMAIL: notexists@mail.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-    restart: unless-stopped
-    links:
-      - postgres-db-compose
