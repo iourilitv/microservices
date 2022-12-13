@@ -6,6 +6,12 @@ Source: https://docs.docker.com/desktop/install/windows-install/
 ## Run docker-demon
 Run Docker Desktop for Window for it
 
+## Build the app in order to update jar-archive
+
+``
+mvn clean install
+``
+
 ## Create the following files in classpath: 
 docker-compose.yaml in order to run group of containers; 
 
