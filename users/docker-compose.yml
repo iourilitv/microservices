@@ -1,0 +1,39 @@
+version: '3.9'
+
+services:
+  app-compose:
+    build:
+      context: ./
+    ports:
+      - "9010:9010"
+    depends_on:
+      - postgres-db-compose
+    environment:
+      POSTGRES_DB_HOST: postgres-db-compose
+      POSTGRES_DB_PORT: 5432
+    restart: unless-stopped
+
+  postgres-db-compose:
+    image: postgres:14.6
+    ports:
+      - "54321:5432"
+    volumes:
+      - "./pg_data:/var/lib/postgresql/data/pgdata"
+      - ./src/main/resources/db/sql/init-db-scripts:/docker-entrypoint-initdb.d
+    environment:
+      POSTGRES_DB: users
+      POSTGRES_USER: microuser
+      POSTGRES_PASSWORD: microuser
+      PGDATA: /var/lib/postgresql/data/pgdata
+    restart: unless-stopped
+
+  pgadmin-compose:
+    image: dpage/pgadmin4:6.9
+    ports:
+      - "8888:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: notexists@mail.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    restart: unless-stopped
+    links:
+      - postgres-db-compose

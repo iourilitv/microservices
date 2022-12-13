@@ -18,14 +18,10 @@ docker pull postgres:14.6
 ## Run container with database PostgreSQL
 The image postgres version 14.6 will be downloaded from hub.docker.com automatically instead of to pull it directly
 
+To save data state use the following arg: -v ./pg_data:/var/lib/postgresql/data/pgdata
+
 ``
-This Doesn't work!
-
-docker run -d --name users-postgres-db -e POSTGRES_DB=users -e POSTGRES_USER=microuser -e POSTGRES_PASSWORD=microuser -v /tmp/postgres-data:var/lib/postgresql/data -p 5001:5432 postgres:14.6
-
-Use the following:
-
-docker run -d --name users-postgres-db -e POSTGRES_DB=users -e POSTGRES_USER=microuser -e POSTGRES_PASSWORD=microuser -p 5001:5432 postgres:14.6
+docker run -d --name users-postgres-db -e POSTGRES_DB=users -e POSTGRES_USER=microuser -e POSTGRES_PASSWORD=microuser -v ./pg_data:/var/lib/postgresql/data/pgdata -p 54321:5432 postgres:14.6
 ``
 
 ## Run container with pgAdmin
@@ -61,3 +57,26 @@ Maintenance database: users
 Username: microuser
 Password: microuser
 
+#### Create schemas:
+users_scheme; users_test_scheme
+
+## Creating docker container for app
+### Create a file Dockerfile with instructions for the container building
+The file location: project classpath
+### Build image for app
+-t - image name; 
+"." means context in the project classpath
+
+``
+docker build -t users-app .
+``
+
+### Run container
+``
+docker run -d --name users-app -p 9010:9010 users-app
+``
+
+### Connect app container to the network
+``
+docker network connect users-db-net users-app
+``
