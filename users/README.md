@@ -36,6 +36,8 @@ Add instructions to run example-ishop-spring app
 
 ## DevOps
 ### Docker containers using instructions is located at devops/docker.md
+### Instructions of how to run docker containers with docker-compose.yaml using is located at devops/docker-compose.md
+### Instructions of how to execute module and integration tests with testcontainers and docker using is located in testcontainers-with-docker.md    
 
 
 ## Should be added
