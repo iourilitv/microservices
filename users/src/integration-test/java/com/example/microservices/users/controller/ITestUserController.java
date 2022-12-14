@@ -5,6 +5,7 @@ import com.example.microservices.users.dto.UserDTO;
 import com.example.microservices.users.entity.City;
 import com.example.microservices.users.entity.User;
 import com.example.microservices.users.repository.CityRepository;
+import com.example.microservices.users.util.TestContainersUtils;
 import com.example.microservices.users.util.UserTestUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -19,9 +20,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.util.TestPropertyValues;
-import org.springframework.context.ApplicationContextInitializer;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -56,7 +54,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @TestMethodOrder(value = MethodOrderer.MethodName.class)
 @AutoConfigureMockMvc
 @SpringBootTest(classes = UsersApplication.class)
-@ContextConfiguration(initializers = {ITestUserController.Initializer.class})
+@ContextConfiguration(initializers = {TestContainersUtils.Initializer.class})
 @Testcontainers
 class ITestUserController {
     private static final int TEST_LIST_SIZE = 5;
@@ -70,26 +68,7 @@ class ITestUserController {
     private final List<User> testUsers = new ArrayList<>(TEST_LIST_SIZE);
 
     @Container
-    public static PostgreSQLContainer<?> sqlContainer = new PostgreSQLContainer<>("postgres:14.6")
-            .withDatabaseName("users")
-            .withUsername("microuser")
-            .withPassword("microuser")
-            //Customizing db schema instead of a default schema, public, but it is not required
-            .withUrlParam("currentSchema", "users_test_scheme")
-            .withInitScript("db/sql/init-db-scripts/01_ddl_create-users_test_scheme.sql")
-            ;
-
-    static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
-        @Override
-        public void initialize(ConfigurableApplicationContext applicationContext) {
-            TestPropertyValues.of(
-                    "spring.datasource.url=" + sqlContainer.getJdbcUrl(),
-                    "spring.datasource.username=" + sqlContainer.getUsername(),
-                    "spring.datasource.password=" + sqlContainer.getPassword(),
-                    "spring.liquibase.enabled=true"
-            ).applyTo(applicationContext.getEnvironment());
-        }
-    }
+    public static PostgreSQLContainer<?> sqlContainer = TestContainersUtils.sqlContainer;
 
     @BeforeEach
     void setUp() {
