@@ -22,8 +22,7 @@ public class TestContainersUtils {
             TestPropertyValues.of(
                     "spring.datasource.url=" + sqlContainer.getJdbcUrl(),
                     "spring.datasource.username=" + sqlContainer.getUsername(),
-                    "spring.datasource.password=" + sqlContainer.getPassword(),
-                    "spring.liquibase.enabled=true"
+                    "spring.datasource.password=" + sqlContainer.getPassword()
             ).applyTo(applicationContext.getEnvironment());
         }
     }
