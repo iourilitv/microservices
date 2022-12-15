@@ -8,8 +8,6 @@ import com.example.microservices.users.repository.CityRepository;
 import com.example.microservices.users.util.TestContainersUtils;
 import com.example.microservices.users.util.UserTestUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.databind.util.StdDateFormat;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,12 +39,16 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.stream.Collectors;
 
-import static com.example.microservices.users.util.UserTestUtils.createTestUser;
+import static com.example.microservices.users.util.MapperTestUtils.initMapper;
+import static com.example.microservices.users.util.UserTestUtils.createUser;
 import static com.example.microservices.users.util.UserTestUtils.toUserDTO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+/**
+ * Module tests
+ */
 
 @Transactional
 @ActiveProfiles(profiles = "integration-test")
@@ -59,21 +61,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ITestUserController {
     private static final int TEST_LIST_SIZE = 5;
 
+    @Container
+    public static PostgreSQLContainer<?> sqlContainer = TestContainersUtils.sqlContainer;
     private @Autowired MockMvc mockMvc;
     private @Autowired EntityManager entityManager;
-    private @Autowired ObjectMapper mapper;
     private @Autowired CityRepository cityRepository;
+    private static final ObjectMapper mapper = initMapper();
 
     private List<City> cities;
     private final List<User> testUsers = new ArrayList<>(TEST_LIST_SIZE);
 
-    @Container
-    public static PostgreSQLContainer<?> sqlContainer = TestContainersUtils.sqlContainer;
-
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        initMapper();
         cities = (List<City>) cityRepository.findAll();
         fillUpTestUsers();
         storeTestData();
@@ -150,7 +150,7 @@ class ITestUserController {
 
     @Test
     void test41_givenNotExistUser_thenCorrect_createUser() throws Exception {
-        User userToCreate = createTestUser(99, cities.get(1));
+        User userToCreate = createUser(99, cities.get(1));
         UserDTO userDTO = toUserDTO(userToCreate);
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(userDTO))).andReturn();
@@ -217,7 +217,7 @@ class ITestUserController {
 
     private void fillUpTestUsers() {
         for (int i = 0; i < TEST_LIST_SIZE; i++) {
-            testUsers.add(createTestUser(i, cities.get(i % cities.size())));
+            testUsers.add(createUser(i, cities.get(i % cities.size())));
         }
     }
 
@@ -228,11 +228,5 @@ class ITestUserController {
     private void storeUser(User user) {
         entityManager.persist(user);
         entityManager.flush();
-    }
-
-    private void initMapper() {
-        mapper = new JsonMapper();
-        mapper.setDateFormat(new StdDateFormat().withColonInTimeZone(true));    //"birthday":"2022-12-02T06:55:59.842+00:00"
-        mapper.setTimeZone(TimeZone.getTimeZone("UTC"));                        // timestamp in db without time zone
     }
 }
