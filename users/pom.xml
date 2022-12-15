@@ -124,8 +124,8 @@
 						<configuration>
 							<skipTests>${skip.integration.tests}</skipTests>
 							<excludes>
-								<!--TODO Complete the test and remove it -->
-								<exclude>**/ITestFollowController.java</exclude>
+								<!-- ITestFollowController has been completed so this is only for example here -->
+<!--								<exclude>**/ITestFollowController.java</exclude>-->
 							</excludes>
 						</configuration>
 						<executions>

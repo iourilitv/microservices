@@ -5,7 +5,7 @@ import com.example.microservices.users.dto.UserDTO;
 import com.example.microservices.users.entity.City;
 import com.example.microservices.users.entity.User;
 import com.example.microservices.users.repository.CityRepository;
-import com.example.microservices.users.util.TestContainersUtils;
+import com.example.microservices.users.util.ITestUtilPostgreSQLContainer;
 import com.example.microservices.users.util.UserTestUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;
@@ -18,6 +18,9 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.util.TestPropertyValues;
+import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -56,13 +59,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @TestMethodOrder(value = MethodOrderer.MethodName.class)
 @AutoConfigureMockMvc
 @SpringBootTest(classes = UsersApplication.class)
-@ContextConfiguration(initializers = {TestContainersUtils.Initializer.class})
-@Testcontainers
+@ContextConfiguration(initializers = {ITestUserController.Initializer.class})
+@Testcontainers(disabledWithoutDocker = true)
 class ITestUserController {
     private static final int TEST_LIST_SIZE = 5;
 
     @Container
-    public static PostgreSQLContainer<?> sqlContainer = TestContainersUtils.sqlContainer;
+    public static PostgreSQLContainer<?> sqlContainer = ITestUtilPostgreSQLContainer.getInstance();
     private @Autowired MockMvc mockMvc;
     private @Autowired EntityManager entityManager;
     private @Autowired CityRepository cityRepository;
@@ -228,5 +231,16 @@ class ITestUserController {
     private void storeUser(User user) {
         entityManager.persist(user);
         entityManager.flush();
+    }
+
+    static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+        @Override
+        public void initialize(ConfigurableApplicationContext applicationContext) {
+            TestPropertyValues.of(
+                    "spring.datasource.url=" + sqlContainer.getJdbcUrl(),
+                    "spring.datasource.username=" + sqlContainer.getUsername(),
+                    "spring.datasource.password=" + sqlContainer.getPassword()
+            ).applyTo(applicationContext.getEnvironment());
+        }
     }
 }
