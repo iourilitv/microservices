@@ -1,5 +1,6 @@
 package com.example.microservices.users.util;
 
+import com.example.microservices.users.dto.FollowDTO;
 import com.example.microservices.users.entity.Follow;
 import com.example.microservices.users.entity.User;
 import org.springframework.lang.NonNull;
@@ -41,6 +42,13 @@ public class FollowTestUtils {
         for (int i = 0; i < size; i++) {
             testFollows.add(createTestFollow(random.nextInt(size)));
         }
+    }
+
+    public static FollowDTO toFollowDTO(@NonNull Follow follow) {
+        FollowDTO dto = new FollowDTO(follow.getFollowingId(), follow.getFollowerId());
+        dto.setId(follow.getId());
+        dto.setFollowedAt(follow.getFollowedAt());
+        return dto;
     }
 
     private static Follow createTestFollow(int i) {

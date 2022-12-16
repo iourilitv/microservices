@@ -1,10 +1,12 @@
 package com.example.microservices.users.controller;
 
 import com.example.microservices.users.UsersApplication;
+import com.example.microservices.users.dto.FollowDTO;
 import com.example.microservices.users.entity.City;
 import com.example.microservices.users.entity.Follow;
 import com.example.microservices.users.entity.User;
 import com.example.microservices.users.repository.CityRepository;
+import com.example.microservices.users.util.FollowTestUtils;
 import com.example.microservices.users.util.ITestUtilPostgreSQLContainer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
@@ -37,6 +39,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.example.microservices.users.util.FollowTestUtils.fillUpFollowsForUsers;
 import static com.example.microservices.users.util.MapperTestUtils.initMapper;
@@ -95,16 +98,10 @@ class ITestFollowController {
                 .andExpect(jsonPath("$.status", Matchers.equalTo("UP")));
     }
 
-//    @Test
-    public void test1_givenRequest_thenCorrect_getAll() throws Exception {
-//    public List<FollowDTO> getAll() {
-//        return followMapper.toDTOList(followService.getAll());
-//    }
-//        List<FollowDTO>
-        String pathString = "/json/actuator-health-response-200.json";
-        Path path = Paths.get(Objects.requireNonNull(ITestFollowController.class.getResource(pathString)).toURI());
-        String expectedJson = Files.readString(path);
-        System.out.println(expectedJson);
+    @Test
+    public void test1_thenCorrect_getAll() throws Exception {
+        List<FollowDTO> dtoList = follows.stream().map(FollowTestUtils::toFollowDTO).collect(Collectors.toList());
+        String expectedJson = mapper.writeValueAsString(dtoList);
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/follows")
                         .contentType(MediaType.APPLICATION_JSON)).andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
@@ -149,3 +146,7 @@ class ITestFollowController {
         entityManager.flush();
     }
 }
+//        String pathString = "/json/actuator-health-response-200.json";
+//        Path path = Paths.get(Objects.requireNonNull(ITestFollowController.class.getResource(pathString)).toURI());
+//        String expectedJson = Files.readString(path);
+//        System.out.println(expectedJson);
