@@ -17,14 +17,10 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.util.TestPropertyValues;
-import org.springframework.context.ApplicationContextInitializer;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -59,8 +55,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestMethodOrder(value = MethodOrderer.MethodName.class)
 @AutoConfigureMockMvc
 @SpringBootTest(classes = UsersApplication.class)
-@ContextConfiguration(initializers = {ITestFollowController.Initializer.class})
-@Testcontainers
+@Testcontainers(disabledWithoutDocker = true)
 class ITestFollowController {
     private static final int TEST_USERS_SIZE = 3;
     private static final int TEST_FOLLOWS_SIZE = TEST_USERS_SIZE * TEST_USERS_SIZE;
@@ -152,16 +147,5 @@ class ITestFollowController {
     private void storeFollow(Follow follow) {
         entityManager.persist(follow);
         entityManager.flush();
-    }
-
-    static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
-        @Override
-        public void initialize(ConfigurableApplicationContext applicationContext) {
-            TestPropertyValues.of(
-                    "spring.datasource.url=" + sqlContainer.getJdbcUrl(),
-                    "spring.datasource.username=" + sqlContainer.getUsername(),
-                    "spring.datasource.password=" + sqlContainer.getPassword()
-            ).applyTo(applicationContext.getEnvironment());
-        }
     }
 }

@@ -30,6 +30,14 @@ public class ITestUtilPostgreSQLContainer extends PostgreSQLContainer<ITestUtilP
     }
 
     @Override
+    public void start() {
+        super.start();
+        System.setProperty("POSTGRES_DB_URL", container.getJdbcUrl());
+        System.setProperty("POSTGRES_DB_USER", container.getUsername());
+        System.setProperty("POSTGRES_DB_PASSWORD", container.getPassword());
+    }
+
+    @Override
     public void stop() {
         //do nothing, JVM handles shut down
         // It allows using one sql container for all ITest classes

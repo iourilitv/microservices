@@ -59,7 +59,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @TestMethodOrder(value = MethodOrderer.MethodName.class)
 @AutoConfigureMockMvc
 @SpringBootTest(classes = UsersApplication.class)
-@ContextConfiguration(initializers = {ITestUserController.Initializer.class})
+@ContextConfiguration(initializers = {ITestUserController.Initializer.class}) // This is only for example another way of implementing
 @Testcontainers(disabledWithoutDocker = true)
 class ITestUserController {
     private static final int TEST_LIST_SIZE = 5;
@@ -233,6 +233,7 @@ class ITestUserController {
         entityManager.flush();
     }
 
+    // This is only for example another way of implementing. The best practice way is in ITestFollowController
     static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
         @Override
         public void initialize(ConfigurableApplicationContext applicationContext) {
