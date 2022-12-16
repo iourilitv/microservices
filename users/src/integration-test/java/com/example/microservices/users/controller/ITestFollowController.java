@@ -6,9 +6,10 @@ import com.example.microservices.users.entity.City;
 import com.example.microservices.users.entity.Follow;
 import com.example.microservices.users.entity.User;
 import com.example.microservices.users.repository.CityRepository;
+import com.example.microservices.users.repository.FollowRepository;
 import com.example.microservices.users.util.FollowTestUtils;
 import com.example.microservices.users.util.ITestUtilPostgreSQLContainer;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.example.microservices.users.util.UserTestUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
@@ -16,7 +17,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.function.Executable;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -30,7 +30,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -42,7 +41,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.example.microservices.users.util.FollowTestUtils.fillUpFollowsForUsers;
@@ -50,9 +48,7 @@ import static com.example.microservices.users.util.FollowTestUtils.toFollowDTO;
 import static com.example.microservices.users.util.MapperTestUtils.initMapper;
 import static com.example.microservices.users.util.UserTestUtils.fillUpUsers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -77,6 +73,7 @@ class ITestFollowController {
     private @Autowired MockMvc mockMvc;
     private @Autowired EntityManager entityManager;
     private @Autowired CityRepository cityRepository;
+    private @Autowired FollowRepository followRepository;
     private static final ObjectMapper mapper = initMapper();
 
     private List<City> cities;
@@ -150,8 +147,8 @@ class ITestFollowController {
     @Test
     void test41_givenExistFollowId_thenCorrect_getFollow() throws Exception {
         Follow expected = follows.get(0);
-        FollowDTO dto = toFollowDTO(expected);
-        String expectedJson = mapper.writeValueAsString(dto);
+        FollowDTO followDTO = toFollowDTO(expected);
+        String expectedJson = mapper.writeValueAsString(followDTO);
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + "/{id}", expected.getId())
                 .contentType(MediaType.APPLICATION_JSON)).andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
@@ -170,11 +167,67 @@ class ITestFollowController {
         assertEquals(expectedHttpStatus.value(), response.getStatus());
     }
 
-//    @PostMapping
-//    public String createFollow(@RequestBody FollowDTO followDTO) {
-//        Follow follow = followMapper.toEntity(followDTO);
-//        return followService.createFollow(follow);
-//    }
+    @Test
+    void test51_givenNew_thenCorrect_createFollow() throws Exception {
+        User user1 = UserTestUtils.createUser(TEST_USERS_SIZE * 100 + 1, cities.get(1));
+        storeUser(user1);
+        User user2 = UserTestUtils.createUser(TEST_USERS_SIZE * 100 + 2, cities.get(2));
+        storeUser(user2);
+        Follow followToSave = new Follow(user1.getId(), user2.getId());
+        FollowDTO followDTO = toFollowDTO(followToSave);
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(BASE_URL)
+                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(followDTO))).andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+
+        Follow savedFollow = followRepository.findByFollowingIdAndFollowerId(followToSave.getFollowingId(), followToSave.getFollowerId()).orElse(null);
+        assertNotNull(savedFollow);
+
+        String expected = String.format("User(id: %s) has been followed to User(id: %s) with Follow(id: %s)",
+                savedFollow.getFollowingId(), savedFollow.getFollowerId(), savedFollow.getId());
+        String actual = response.getContentAsString();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void test52_givenWithId_thenError_createFollow() throws Exception {
+        String pathString = "/json/follow-create-with-id-request.json";
+        Path path = Paths.get(Objects.requireNonNull(ITestFollowController.class.getResource(pathString)).toURI());
+        String followDTOJson = Files.readString(path);
+        HttpStatus expectedHttpStatus = HttpStatus.PRECONDITION_FAILED;
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(BASE_URL)
+                .contentType(MediaType.APPLICATION_JSON).content(followDTOJson)).andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+        assertEquals(expectedHttpStatus.value(), response.getStatus());
+    }
+
+    @Test
+    void test53_givenWithSameFollowingIdAndFollowerId_thenError_createFollow() throws Exception {
+        Long sameUserId = 999L;
+        FollowDTO followDTO = new FollowDTO(sameUserId, sameUserId);
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(BASE_URL)
+                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(followDTO))).andReturn();
+        HttpStatus expectedHttpStatus = HttpStatus.PRECONDITION_FAILED;
+
+        MockHttpServletResponse response = mvcResult.getResponse();
+        assertEquals(expectedHttpStatus.value(), response.getStatus());
+    }
+
+    @Test
+    void test54_givenExist_thenError_createFollow() throws Exception {
+        Follow existFollow = follows.get(0);
+        FollowDTO followDTO = toFollowDTO(existFollow);
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post(BASE_URL)
+                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(followDTO))).andReturn();
+        HttpStatus expectedHttpStatus = HttpStatus.PRECONDITION_FAILED;
+
+        MockHttpServletResponse response = mvcResult.getResponse();
+        assertEquals(expectedHttpStatus.value(), response.getStatus());
+    }
 
 //    @DeleteMapping(value = "/{id}")
 //    public String deleteFollow(@PathVariable Long id) {
@@ -191,7 +244,3 @@ class ITestFollowController {
         entityManager.flush();
     }
 }
-//        String pathString = "/json/actuator-health-response-200.json";
-//        Path path = Paths.get(Objects.requireNonNull(ITestFollowController.class.getResource(pathString)).toURI());
-//        String expectedJson = Files.readString(path);
-//        System.out.println(expectedJson);
