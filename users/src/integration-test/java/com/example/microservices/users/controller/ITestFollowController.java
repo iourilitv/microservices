@@ -41,6 +41,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.example.microservices.users.util.FollowTestUtils.fillUpFollowsForUsers;
@@ -48,6 +49,7 @@ import static com.example.microservices.users.util.FollowTestUtils.toFollowDTO;
 import static com.example.microservices.users.util.MapperTestUtils.initMapper;
 import static com.example.microservices.users.util.UserTestUtils.fillUpUsers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -229,10 +231,37 @@ class ITestFollowController {
         assertEquals(expectedHttpStatus.value(), response.getStatus());
     }
 
-//    @DeleteMapping(value = "/{id}")
-//    public String deleteFollow(@PathVariable Long id) {
-//        return followService.deleteFollow(id)
-//    }
+    @Test
+    void test61_givenExist_thenCorrect_deleteFollow() throws Exception {
+        Follow followToDelete = follows.get(0);
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete(BASE_URL + "/{id}", followToDelete.getId())
+                .contentType(MediaType.APPLICATION_JSON)).andReturn();
+
+        MockHttpServletResponse response = mvcResult.getResponse();
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+
+        String expected = String.format("User(id: %s) has been followed out from User(id: %s). The Follow(id: %s) has been deleted",
+                followToDelete.getFollowingId(), followToDelete.getFollowerId(), followToDelete.getId());
+        String actual = response.getContentAsString();
+        assertEquals(expected, actual);
+
+        Optional<Follow> deletedFollowOpt = followRepository.findById(followToDelete.getId());
+        assertFalse(deletedFollowOpt.isPresent());
+    }
+
+    @Test
+    void test62_givenNotExist_thenCorrect_deleteFollow() throws Exception {
+        Long notExistFollowId = 999L;
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.delete(BASE_URL + "/{id}", notExistFollowId)
+                .contentType(MediaType.APPLICATION_JSON)).andReturn();
+
+        MockHttpServletResponse response = mvcResult.getResponse();
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+
+        String expected = String.format("There is no Follow to delete with id: %s", notExistFollowId);
+        String actual = response.getContentAsString();
+        assertEquals(expected, actual);
+    }
 
     private void storeUser(User user) {
         entityManager.persist(user);
