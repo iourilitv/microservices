@@ -36,8 +36,7 @@ public class FollowService {
 
     @Transactional
     public String createFollow(Follow follow) {
-        if (follow.getId() != null
-                || Objects.equals(follow.getFollowingId(), follow.getFollowerId())
+        if (Objects.equals(follow.getFollowingId(), follow.getFollowerId())
                 || followRepository.findByFollowingIdAndFollowerId(follow.getFollowingId(), follow.getFollowerId()).isPresent()
                     ) {
             throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED);
