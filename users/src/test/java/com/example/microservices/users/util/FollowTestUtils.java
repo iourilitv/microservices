@@ -1,8 +1,11 @@
 package com.example.microservices.users.util;
 
+import com.example.microservices.users.dto.FollowDTO;
 import com.example.microservices.users.entity.Follow;
 import com.example.microservices.users.entity.User;
+import org.springframework.lang.NonNull;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -16,11 +19,22 @@ public class FollowTestUtils {
         for (int i = 0; i < users.size(); i++) {
             long followingId = random.nextInt(users.size());
             long followerId = random.nextInt(users.size());
-            if (followingId != followerId) {
+            if (isAcceptableFollowParams(set, followingId, followerId)) {
                 set.add(new TestFollow(100L + i, followingId, followerId));
             }
         }
         return set;
+    }
+
+    public static void fillUpFollowsForUsers(int followsSize, @NonNull List<Follow> follows, @NonNull List<User> users) {
+        Random random = new Random();
+        for (int i = 0; i < followsSize; i++) {
+            long followingId = getRandomUserId(users, random);
+            long followerId = getRandomUserId(users, random);
+            if (isAcceptableFollowParams(follows, followingId, followerId)) {
+                follows.add(new Follow(followingId, followerId));
+            }
+        }
     }
 
     public static void fillUpTestFollows(int size, List<Follow> testFollows) {
@@ -28,6 +42,13 @@ public class FollowTestUtils {
         for (int i = 0; i < size; i++) {
             testFollows.add(createTestFollow(random.nextInt(size)));
         }
+    }
+
+    public static FollowDTO toFollowDTO(@NonNull Follow follow) {
+        FollowDTO dto = new FollowDTO(follow.getFollowingId(), follow.getFollowerId());
+        dto.setId(follow.getId());
+        dto.setFollowedAt(follow.getFollowedAt());
+        return dto;
     }
 
     private static Follow createTestFollow(int i) {
@@ -40,6 +61,15 @@ public class FollowTestUtils {
             followerId = 3L + i;
         }
         return new TestFollow(10L + i, followingId, followerId);
+    }
+
+    private static long getRandomUserId(@NonNull List<User> users, @NonNull Random random) {
+        return users.get(random.nextInt(users.size())).getId();
+    }
+
+    private static boolean isAcceptableFollowParams(Collection<Follow> follows, long followingId, long followerId) {
+        return followingId != followerId
+                && follows.stream().noneMatch(f -> followingId == f.getFollowingId() && followerId == f.getFollowerId());
     }
 
     public static class TestFollow extends Follow {

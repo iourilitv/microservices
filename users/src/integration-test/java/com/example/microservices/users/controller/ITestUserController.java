@@ -5,10 +5,9 @@ import com.example.microservices.users.dto.UserDTO;
 import com.example.microservices.users.entity.City;
 import com.example.microservices.users.entity.User;
 import com.example.microservices.users.repository.CityRepository;
+import com.example.microservices.users.util.ITestUtilPostgreSQLContainer;
 import com.example.microservices.users.util.UserTestUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.databind.util.StdDateFormat;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,15 +18,22 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.util.TestPropertyValues;
+import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -36,12 +42,16 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.stream.Collectors;
 
-import static com.example.microservices.users.util.UserTestUtils.createTestUser;
+import static com.example.microservices.users.util.MapperTestUtils.initMapper;
+import static com.example.microservices.users.util.UserTestUtils.createUser;
 import static com.example.microservices.users.util.UserTestUtils.toUserDTO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+/**
+ * Module tests
+ */
 
 @Transactional
 @ActiveProfiles(profiles = "integration-test")
@@ -49,13 +59,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @TestMethodOrder(value = MethodOrderer.MethodName.class)
 @AutoConfigureMockMvc
 @SpringBootTest(classes = UsersApplication.class)
+@ContextConfiguration(initializers = {ITestUserController.Initializer.class}) // This is only for example another way of implementing
+@Testcontainers(disabledWithoutDocker = true)
 class ITestUserController {
     private static final int TEST_LIST_SIZE = 5;
 
+    @Container
+    public static PostgreSQLContainer<?> sqlContainer = ITestUtilPostgreSQLContainer.getInstance();
     private @Autowired MockMvc mockMvc;
     private @Autowired EntityManager entityManager;
-    private @Autowired ObjectMapper mapper;
     private @Autowired CityRepository cityRepository;
+    private static final ObjectMapper mapper = initMapper();
 
     private List<City> cities;
     private final List<User> testUsers = new ArrayList<>(TEST_LIST_SIZE);
@@ -63,7 +77,6 @@ class ITestUserController {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        initMapper();
         cities = (List<City>) cityRepository.findAll();
         fillUpTestUsers();
         storeTestData();
@@ -140,7 +153,7 @@ class ITestUserController {
 
     @Test
     void test41_givenNotExistUser_thenCorrect_createUser() throws Exception {
-        User userToCreate = createTestUser(99, cities.get(1));
+        User userToCreate = createUser(99, cities.get(1));
         UserDTO userDTO = toUserDTO(userToCreate);
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/users")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(userDTO))).andReturn();
@@ -207,7 +220,7 @@ class ITestUserController {
 
     private void fillUpTestUsers() {
         for (int i = 0; i < TEST_LIST_SIZE; i++) {
-            testUsers.add(createTestUser(i, cities.get(i % cities.size())));
+            testUsers.add(createUser(i, cities.get(i % cities.size())));
         }
     }
 
@@ -220,9 +233,15 @@ class ITestUserController {
         entityManager.flush();
     }
 
-    private void initMapper() {
-        mapper = new JsonMapper();
-        mapper.setDateFormat(new StdDateFormat().withColonInTimeZone(true));    //"birthday":"2022-12-02T06:55:59.842+00:00"
-        mapper.setTimeZone(TimeZone.getTimeZone("UTC"));                        // timestamp in db without time zone
+    // This is only for example another way of implementing. The best practice way is in ITestFollowController
+    static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+        @Override
+        public void initialize(ConfigurableApplicationContext applicationContext) {
+            TestPropertyValues.of(
+                    "spring.datasource.url=" + sqlContainer.getJdbcUrl(),
+                    "spring.datasource.username=" + sqlContainer.getUsername(),
+                    "spring.datasource.password=" + sqlContainer.getPassword()
+            ).applyTo(applicationContext.getEnvironment());
+        }
     }
 }

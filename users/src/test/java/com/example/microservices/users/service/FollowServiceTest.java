@@ -111,24 +111,6 @@ class FollowServiceTest {
     }
 
     @Test
-    void test52_givenWithId_thenError_createFollow() {
-        Follow followToSave = new TestFollow(1000L, 9L, 8L);
-        HttpStatus expectedHttpStatus = HttpStatus.PRECONDITION_FAILED;
-        final HttpStatus[] actualHttpStatus = new HttpStatus[1];
-        Executable actual = () -> {
-            try {
-                service.createFollow(followToSave);
-            }
-            catch (ResponseStatusException e) {
-                actualHttpStatus[0] = e.getStatus();
-                throw e;
-            }
-        };
-        assertThrows(ResponseStatusException.class, actual);
-        assertEquals(expectedHttpStatus, actualHttpStatus[0]);
-    }
-
-    @Test
     void test53_givenWithSameFollowingIdAndFollowerId_thenError_createFollow() {
         Long sameId = 1L;
         Follow followToSave = new Follow(sameId, sameId);

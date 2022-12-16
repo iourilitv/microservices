@@ -18,9 +18,15 @@ import static com.example.microservices.users.util.FollowTestUtils.createFollowS
 
 public class UserTestUtils {
 
+    public static void fillUpUsers(int size, List<User> users, List<City> cities) {
+        for (int i = 0; i < size; i++) {
+            users.add(createUser(i, cities.get(i % cities.size())));
+        }
+    }
+
     public static void fillUpTestUsers(int size, List<User> testUsers) {
         for (int i = 0; i < size; i++) {
-            testUsers.add(createTestUser(i + 1));
+            testUsers.add(createUserWithId(i + 1));
         }
         Set<Follow> followSet = createFollowSetForUsers(testUsers);
         setFollowings(testUsers, followSet);
@@ -39,7 +45,7 @@ public class UserTestUtils {
                 .collect(Collectors.toSet())));
     }
 
-    public static User createTestUser(int index) {
+    public static User createUserWithId(int index) {
         User user = new User(10L + index, "my_nick_name" + index);
         user.setFirstName("test_firstName" + index);
         user.setLastName("test_lastName" + index);
@@ -54,7 +60,7 @@ public class UserTestUtils {
         return user;
     }
 
-    public static User createTestUser(int index, City currentCity) {
+    public static User createUser(int index, City currentCity) {
         User user = new User("test_firstName" + index, "test_lastName" + index, Gender.values()[index % Gender.values().length],
                 new Date(), currentCity, "my_nick_name" + index);
         user.setSecondName("test_secondName" + index);
