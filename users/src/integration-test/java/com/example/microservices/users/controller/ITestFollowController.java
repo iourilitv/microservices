@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -29,6 +30,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -40,6 +42,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.example.microservices.users.util.FollowTestUtils.fillUpFollowsForUsers;
@@ -48,6 +51,7 @@ import static com.example.microservices.users.util.MapperTestUtils.initMapper;
 import static com.example.microservices.users.util.UserTestUtils.fillUpUsers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -143,12 +147,28 @@ class ITestFollowController {
         assertEquals(expectedJson, actualJson);
     }
 
+    @Test
+    void test41_givenExistFollowId_thenCorrect_getFollow() throws Exception {
+        Follow expected = follows.get(0);
+        FollowDTO dto = toFollowDTO(expected);
+        String expectedJson = mapper.writeValueAsString(dto);
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + "/{id}", expected.getId())
+                .contentType(MediaType.APPLICATION_JSON)).andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+        String actualJson = response.getContentAsString();
+        assertEquals(expectedJson, actualJson);
+    }
 
-
-//    @GetMapping(value = "/{id}")
-//    public FollowDTO getFollow(@PathVariable long id) {
-//        return followMapper.toDTO(followService.getFollow(id));
-//    }
+    @Test
+    void test42_givenNotExistFollowId_thenError_getFollow() throws Exception {
+        long notExistId = 9999L;
+        HttpStatus expectedHttpStatus = HttpStatus.NOT_FOUND;
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + "/{id}", notExistId)
+                .contentType(MediaType.APPLICATION_JSON)).andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+        assertEquals(expectedHttpStatus.value(), response.getStatus());
+    }
 
 //    @PostMapping
 //    public String createFollow(@RequestBody FollowDTO followDTO) {
