@@ -8,6 +8,7 @@ import com.example.microservices.users.entity.User;
 import com.example.microservices.users.repository.CityRepository;
 import com.example.microservices.users.util.FollowTestUtils;
 import com.example.microservices.users.util.ITestUtilPostgreSQLContainer;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
@@ -42,9 +43,12 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.example.microservices.users.util.FollowTestUtils.fillUpFollowsForUsers;
+import static com.example.microservices.users.util.FollowTestUtils.toFollowDTO;
 import static com.example.microservices.users.util.MapperTestUtils.initMapper;
 import static com.example.microservices.users.util.UserTestUtils.fillUpUsers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -62,6 +66,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ITestFollowController {
     private static final int TEST_USERS_SIZE = 3;
     private static final int TEST_FOLLOWS_SIZE = TEST_USERS_SIZE * TEST_USERS_SIZE;
+    private static final String BASE_URL = "/follows";
 
     @Container
     public static PostgreSQLContainer<?> sqlContainer = ITestUtilPostgreSQLContainer.getInstance();
@@ -102,7 +107,7 @@ class ITestFollowController {
     public void test1_thenCorrect_getAll() throws Exception {
         List<FollowDTO> dtoList = follows.stream().map(FollowTestUtils::toFollowDTO).collect(Collectors.toList());
         String expectedJson = mapper.writeValueAsString(dtoList);
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/follows")
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)).andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
         assertEquals(HttpStatus.OK.value(), response.getStatus());
@@ -110,15 +115,35 @@ class ITestFollowController {
         assertEquals(expectedJson, actualJson);
     }
 
-//    @GetMapping("/followings/{followerId}")
-//    public List<FollowDTO> getAllFollowings(@PathVariable Long followerId) {
-//        return followMapper.toDTOList(followService.getAllFollowings(followerId));
-//    }
+    @Test
+    void test2_givenFollowerId_thenCorrect_getAllFollowings() throws Exception {
+        long followerId = follows.get(0).getFollowerId();
+        List<Follow> followings = follows.stream().filter(f -> followerId == f.getFollowerId()).collect(Collectors.toList());
+        List<FollowDTO> followingDTOs = followings.stream().map(FollowTestUtils::toFollowDTO).collect(Collectors.toList());
+        String expectedJson = mapper.writeValueAsString(followingDTOs);
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + "/followings/{followerId}", followerId)
+                .contentType(MediaType.APPLICATION_JSON)).andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+        String actualJson = response.getContentAsString();
+        assertEquals(expectedJson, actualJson);
+    }
 
-//    @GetMapping("/followers/{followingId}")
-//    public List<FollowDTO> getAllFollowers(@PathVariable Long followingId) {
-//        return followMapper.toDTOList(followService.getAllFollowers(followingId));
-//    }
+    @Test
+    void test3_givenFollowingId_thenCorrect_getAllFollowers() throws Exception {
+        long followingId = follows.get(0).getFollowingId();
+        List<Follow> followers = follows.stream().filter(f -> followingId == f.getFollowingId()).collect(Collectors.toList());
+        List<FollowDTO> followerDTOs = followers.stream().map(FollowTestUtils::toFollowDTO).collect(Collectors.toList());
+        String expectedJson = mapper.writeValueAsString(followerDTOs);
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + "/followers/{followingId}", followingId)
+                .contentType(MediaType.APPLICATION_JSON)).andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+        String actualJson = response.getContentAsString();
+        assertEquals(expectedJson, actualJson);
+    }
+
+
 
 //    @GetMapping(value = "/{id}")
 //    public FollowDTO getFollow(@PathVariable long id) {
