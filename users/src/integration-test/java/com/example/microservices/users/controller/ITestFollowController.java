@@ -11,6 +11,7 @@ import com.example.microservices.users.util.FollowTestUtils;
 import com.example.microservices.users.util.ITestUtilPostgreSQLContainer;
 import com.example.microservices.users.util.UserTestUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +35,6 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import javax.persistence.EntityManager;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;

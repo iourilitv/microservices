@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.7.5</version>
+		<version>3.0.0</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
@@ -16,7 +16,7 @@
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
-		<java.version>11</java.version>
+		<java.version>17</java.version>
 		<mapstruct.version>1.5.3.Final</mapstruct.version>
 		<maven-compiler-plugin.lombok-mapstruct-binding.version>0.2.0</maven-compiler-plugin.lombok-mapstruct-binding.version>
 		<maven-compiler-plugin.lombok.version>1.18.24</maven-compiler-plugin.lombok.version>
@@ -38,6 +38,14 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<!-- Fixed the following exception after transferred to Spring Boot 3.0.0:
+		o.h.c.beanvalidation.TypeSafeActivator   : Error calling `jakarta.validation.Validation#buildDefaultValidatorFactory`
+		jakarta.validation.NoProviderFoundException: Unable to create a Configuration,
+		because no Jakarta Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath. -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springdoc</groupId>
@@ -188,7 +196,7 @@
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
 							<version>${maven-compiler-plugin.lombok.version}</version>
-							</path>
+						</path>
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok-mapstruct-binding</artifactId>

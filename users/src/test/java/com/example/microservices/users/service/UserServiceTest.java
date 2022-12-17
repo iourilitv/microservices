@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.function.Executable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
@@ -65,13 +66,13 @@ class UserServiceTest {
         long notExistId = 9999L;
         HttpStatus expectedHttpStatus = HttpStatus.NOT_FOUND;
         when(repository.findById(notExistId)).thenThrow(new ResponseStatusException(expectedHttpStatus));
-        final HttpStatus[] actualHttpStatus = new HttpStatus[1];
+        final HttpStatusCode[] actualHttpStatus = new HttpStatus[1];
         Executable actual = () -> {
             try {
                 service.getUser(notExistId);
             }
             catch (ResponseStatusException e) {
-                actualHttpStatus[0] = e.getStatus();
+                actualHttpStatus[0] = e.getStatusCode();
                 throw e;
             }
         };
@@ -108,13 +109,13 @@ class UserServiceTest {
         User user = new User("new first name", "new last name", Gender.FEMALE, new Date(), city, "new_user");
         HttpStatus expectedHttpStatus = HttpStatus.PRECONDITION_FAILED;
         when(repository.findByNickname(user.getNickname())).thenReturn(Optional.of(user));
-        final HttpStatus[] actualHttpStatus = new HttpStatus[1];
+        final HttpStatusCode[] actualHttpStatus = new HttpStatus[1];
         Executable actual = () -> {
             try {
                 service.createUser(user);
             }
             catch (ResponseStatusException e) {
-                actualHttpStatus[0] = e.getStatus();
+                actualHttpStatus[0] = e.getStatusCode();
                 throw e;
             }
         };
@@ -138,13 +139,13 @@ class UserServiceTest {
         Long notExistId = 999L;
         when(repository.findById(notExistId)).thenReturn(Optional.empty());
         HttpStatus expectedHttpStatus = HttpStatus.PRECONDITION_FAILED;
-        final HttpStatus[] actualHttpStatus = new HttpStatus[1];
+        final HttpStatusCode[] actualHttpStatus = new HttpStatus[1];
         Executable actual = () -> {
             try {
                 service.deleteUser(notExistId);
             }
             catch (ResponseStatusException e) {
-                actualHttpStatus[0] = e.getStatus();
+                actualHttpStatus[0] = e.getStatusCode();
                 throw e;
             }
         };
@@ -158,13 +159,13 @@ class UserServiceTest {
         isDeletedUser.setDeleted(true);
         when(repository.findById(isDeletedUser.getId())).thenReturn(Optional.of(isDeletedUser));
         HttpStatus expectedHttpStatus = HttpStatus.PRECONDITION_FAILED;
-        final HttpStatus[] actualHttpStatus = new HttpStatus[1];
+        final HttpStatusCode[] actualHttpStatus = new HttpStatus[1];
         Executable actual = () -> {
             try {
                 service.deleteUser(isDeletedUser.getId());
             }
             catch (ResponseStatusException e) {
-                actualHttpStatus[0] = e.getStatus();
+                actualHttpStatus[0] = e.getStatusCode();
                 throw e;
             }
         };

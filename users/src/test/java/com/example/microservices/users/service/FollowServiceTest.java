@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.function.Executable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
@@ -83,13 +84,13 @@ class FollowServiceTest {
         Follow follow = new TestFollow(2L * testFollows.size(), 1L, 2L);
         HttpStatus expectedHttpStatus = HttpStatus.NOT_FOUND;
         when(repository.findById(follow.getId())).thenThrow(new ResponseStatusException(expectedHttpStatus));
-        final HttpStatus[] actualHttpStatus = new HttpStatus[1];
+        final HttpStatusCode[] actualHttpStatus = new HttpStatus[1];
         Executable actual = () -> {
             try {
                 service.getFollow(follow.getId());
             }
             catch (ResponseStatusException e) {
-                actualHttpStatus[0] = e.getStatus();
+                actualHttpStatus[0] = e.getStatusCode();
                 throw e;
             }
         };
@@ -115,13 +116,13 @@ class FollowServiceTest {
         Long sameId = 1L;
         Follow followToSave = new Follow(sameId, sameId);
         HttpStatus expectedHttpStatus = HttpStatus.PRECONDITION_FAILED;
-        final HttpStatus[] actualHttpStatus = new HttpStatus[1];
+        final HttpStatusCode[] actualHttpStatus = new HttpStatus[1];
         Executable actual = () -> {
             try {
                 service.createFollow(followToSave);
             }
             catch (ResponseStatusException e) {
-                actualHttpStatus[0] = e.getStatus();
+                actualHttpStatus[0] = e.getStatusCode();
                 throw e;
             }
         };
@@ -137,13 +138,13 @@ class FollowServiceTest {
         when(repository.findByFollowingIdAndFollowerId(followToSave.getFollowingId(), followToSave.getFollowerId()))
                 .thenReturn(Optional.of(savedFollow));
         when(repository.save(followToSave)).thenReturn(savedFollow);
-        final HttpStatus[] actualHttpStatus = new HttpStatus[1];
+        final HttpStatusCode[] actualHttpStatus = new HttpStatus[1];
         Executable actual = () -> {
             try {
                 service.createFollow(followToSave);
             }
             catch (ResponseStatusException e) {
-                actualHttpStatus[0] = e.getStatus();
+                actualHttpStatus[0] = e.getStatusCode();
                 throw e;
             }
         };
