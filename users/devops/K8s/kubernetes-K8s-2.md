@@ -46,6 +46,8 @@ service "users-pg-db-service" deleted
 
 ### Tried to add volumes into the deployment like it was done in docker-compose.yml but not successfully
 Used users-pg-db-deployment-volumes.yaml file for deployment
+See devops/K8s/logs/issue-deployment-with-volumes.log
+
 So trying to do this manually.
 
 ### Add env block into the file and repeat the creating

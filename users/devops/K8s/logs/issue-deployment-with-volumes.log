@@ -1,0 +1,62 @@
+Tried to add volumes into the deployment like it was done in docker-compose.yml but not successfully
+See users-pg-db-deployment-volumes.yaml file.
+
+PS D:\projects\examples\microservices\users> kubectl get deployment.apps
+No resources found in default namespace.
+
+PS D:\projects\examples\microservices\users> kubectl apply -f users-pg-db-deployment.yaml
+deployment.apps/users-pg-db-deployment created
+service/users-pg-db-service created
+
+PS D:\projects\examples\microservices\users> kubectl get pods
+NAME                                      READY   STATUS                 RESTARTS   AGE
+users-pg-db-deployment-6467b5fc58-7hkqc   0/1     CreateContainerError   0          12s
+users-pg-db-deployment-6467b5fc58-kw7dc   0/1     CreateContainerError   0          12s
+
+PS D:\projects\examples\microservices\users> kubectl get pods
+NAME                                      READY   STATUS                 RESTARTS   AGE
+users-pg-db-deployment-6467b5fc58-7hkqc   0/1     CreateContainerError   0          29s
+users-pg-db-deployment-6467b5fc58-kw7dc   0/1     CreateContainerError   0          29s
+
+PS D:\projects\examples\microservices\users> kubectl --v=8 logs users-pg-db-deployment-6467b5fc58-7hkqc
+I1223 14:17:19.954835    3788 loader.go:374] Config loaded from file:  C:\Users\iurii\.kube\config
+I1223 14:17:20.070473    3788 cert_rotation.go:137] Starting client certificate rotation controller
+I1223 14:17:20.106862    3788 round_trippers.go:463] GET https://192.168.59.102:8443/api/v1/namespaces/default/pods/users-pg-db-deployment-6467b5fc58-7hkqc
+I1223 14:17:20.107458    3788 round_trippers.go:469] Request Headers:
+I1223 14:17:20.108119    3788 round_trippers.go:473]     Accept: application/json, */*
+I1223 14:17:20.108728    3788 round_trippers.go:473]     User-Agent: kubectl.exe/v1.25.2 (windows/amd64) kubernetes/5835544
+I1223 14:17:20.184974    3788 round_trippers.go:574] Response Status: 200 OK in 74 milliseconds
+I1223 14:17:20.185536    3788 round_trippers.go:577] Response Headers:
+I1223 14:17:20.235523    3788 round_trippers.go:580]     Audit-Id: a86b2589-e0f4-412e-bba3-a15ebcf35739
+I1223 14:17:20.236462    3788 round_trippers.go:580]     Cache-Control: no-cache, private
+I1223 14:17:20.237138    3788 round_trippers.go:580]     Content-Type: application/json
+I1223 14:17:20.237891    3788 round_trippers.go:580]     X-Kubernetes-Pf-Flowschema-Uid: 33704b2e-6a12-4963-9a29-3448dbb210b0
+I1223 14:17:20.238652    3788 round_trippers.go:580]     X-Kubernetes-Pf-Prioritylevel-Uid: 6e70346f-cb91-4e21-b0f4-d56daf395f78
+I1223 14:17:20.238769    3788 round_trippers.go:580]     Date: Fri, 23 Dec 2022 11:17:20 GMT
+I1223 14:17:20.240356    3788 request.go:1154] Response Body: {"kind":"Pod","apiVersion":"v1","metadata":{"name":"users-pg-db-deployment-6467b5fc58-7hkqc","generateName":"users-pg-db-deployment-6467b5fc58-",
+"namespace":"default","uid":"4f10c97e-0310-4f94-b0d5-78ee45f91c23","resourceVersion":"18357","creationTimestamp":"2022-12-23T11:16:24Z","labels":{"app":"users-pg-db","pod-template-hash":"6467b5fc58"},"ownerR
+eferences":[{"apiVersion":"apps/v1","kind":"ReplicaSet","name":"users-pg-db-deployment-6467b5fc58","uid":"c4511fef-158a-4aba-a427-a5a8262755f8","controller":true,"blockOwnerDeletion":true}],"managedFields":[
+{"manager":"kube-controller-manager","operation":"Update","apiVersion":"v1","time":"2022-12-23T11:16:24Z","fieldsType":"FieldsV1","fieldsV1":{"f:metadata":{"f:generateName":{},"f:labels":{".":{},"f:app":{},"
+f:pod-template-hash":{}},"f:ownerReferences":{".":{},"k:{\"uid\":\"c4511fef-158a-4aba-a427-a5a8262755f8\"}":{}}},"f:spec":{"f:containers":{"k:{\"name\":\"users-pg-db\"}":{".":{},"f:env":{".":{},"k:{\"name\":
+\"PGDATA\"}":{".":{},"f:name":{},"f:value":{}},"k:{ [truncated 4742 chars]
+I1223 14:17:20.250633    3788 round_trippers.go:463] GET https://192.168.59.102:8443/api/v1/namespaces/default/pods/users-pg-db-deployment-6467b5fc58-7hkqc/log?container=users-pg-db
+I1223 14:17:20.250667    3788 round_trippers.go:469] Request Headers:
+I1223 14:17:20.251294    3788 round_trippers.go:473]     Accept: application/json, */*
+I1223 14:17:20.251859    3788 round_trippers.go:473]     User-Agent: kubectl.exe/v1.25.2 (windows/amd64) kubernetes/5835544
+I1223 14:17:20.938242    3788 round_trippers.go:574] Response Status: 400 Bad Request in 684 milliseconds
+I1223 14:17:20.938539    3788 round_trippers.go:577] Response Headers:
+I1223 14:17:20.939734    3788 round_trippers.go:580]     Audit-Id: 75c65b20-55cc-4d0d-aa09-b1f257fbe59f
+I1223 14:17:20.940314    3788 round_trippers.go:580]     Cache-Control: no-cache, private
+I1223 14:17:20.940918    3788 round_trippers.go:580]     Content-Type: application/json
+I1223 14:17:20.941451    3788 round_trippers.go:580]     Content-Length: 233
+I1223 14:17:20.942310    3788 round_trippers.go:580]     Date: Fri, 23 Dec 2022 11:17:20 GMT
+I1223 14:17:20.942310    3788 request.go:1154] Response Body: {"kind":"Status","apiVersion":"v1","metadata":{},"status":"Failure","message":"container \"users-pg-db\" in pod \"users-pg-db-deployment-6467b5fc
+58-7hkqc\" is waiting to start: CreateContainerError","reason":"BadRequest","code":400}
+I1223 14:17:20.944539    3788 helpers.go:246] server response object: [{
+  "metadata": {},
+  "status": "Failure",
+  "message": "container \"users-pg-db\" in pod \"users-pg-db-deployment-6467b5fc58-7hkqc\" is waiting to start: CreateContainerError",
+  "reason": "BadRequest",
+  "code": 400
+}]
+Error from server (BadRequest): container "users-pg-db" in pod "users-pg-db-deployment-6467b5fc58-7hkqc" is waiting to start: CreateContainerError
