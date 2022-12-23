@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users-pg-db-deployment
+  labels:
+    app: users-pg-db
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: users-pg-db
+  template:
+    metadata:
+      labels:
+        app: users-pg-db
+    spec:
+      containers:
+      - name: users-pg-db
+        image: yuryli/k8s-users-pg-db:14.6
+        ports:
+          - containerPort: 5432
+        env:
+          - name: POSTGRES_DB
+            value: "users"
+          - name: POSTGRES_USER
+            value: "microuser"
+          - name: POSTGRES_PASSWORD
+            value: "microuser"
+          - name: PGDATA
+            value: "/var/lib/postgresql/data/pgdata"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: users-pg-db-service
+spec:
+  type: LoadBalancer      #This only to get access to service from outside by nodePort. In order to use pgAdmin to configure database
+  selector:
+    app: users-pg-db
+  ports:
+    - protocol: TCP
+      port: 54321
+      targetPort: 5432
+      nodePort: 30543

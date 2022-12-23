@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users-pg-db-deployment
+  labels:
+    app: users-pg-db
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: users-pg-db
+  template:
+    metadata:
+      labels:
+        app: users-pg-db
+    spec:
+      containers:
+      - name: users-pg-db
+        image: yuryli/k8s-users-pg-db:14.6
+        ports:
+          - containerPort: 5432
+        env:
+          - name: POSTGRES_DB
+            value: "users"
+          - name: POSTGRES_USER
+            value: "microuser"
+          - name: POSTGRES_PASSWORD
+            value: "microuser"
+          - name: PGDATA
+            value: "/var/lib/postgresql/data/pgdata"
+        volumeMounts:                                     # this produces error
+          - mountPath: "/var/lib/postgresql/data/pgdata"
+            name: "users-pgdata"
+          - mountPath: "/docker-entrypoint-initdb.d"
+            name: "users-pg-initdb"
+      volumes:                                            # this produces error
+        - hostPath:
+            path: "./pg_data"
+          name: users-pgdata
+        - hostPath:
+            path: "./src/main/resources/db/sql/init-db-scripts"
+          name: users-pg-initdb
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: users-pg-db-service
+spec:
+  selector:
+    app: users-pg-db
+  ports:
+    - protocol: TCP
+      port: 54321
+      targetPort: 5432
