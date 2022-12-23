@@ -34,10 +34,15 @@ Add instructions to configue example-ishop-spring app
 Add instructions to run example-ishop-spring app
 ```
 
+## OpenApi of the app is acceptable in a browser
+In browser: http://192.168.59.102:30001/swagger-ui/index.html
+
+
 ## DevOps
 ### Docker containers using instructions is located at devops/docker.md
 ### Instructions of how to run docker containers with docker-compose.yaml using is located at devops/docker-compose.md
 ### Instructions of how to execute module and integration tests with testcontainers and docker using is located in testcontainers-with-docker.md    
+### Instructions of how to run docker containers with kubernetes is located in devops/K8s folder
 
 
 ## Should be added
