@@ -1,0 +1,30 @@
+If start cluster minikube. For restart the exists as well
+In Windows PowerShell
+``
+minikube start --driver=virtualbox --no-vtx-check
+``
+
+PS D:\projects\examples\microservices\users> minikube start --driver=virtualbox --no-vtx-check
+* minikube v1.28.0 на Microsoft Windows 10 Home Single Language 10.0.19044 Build 19044
+* Используется драйвер virtualbox на основе существующего профиля
+* Запускается control plane узел minikube в кластере minikube
+* virtualbox "minikube" VM is missing, will recreate.
+* Creating virtualbox VM (CPUs=2, Memory=3000MB, Disk=20000MB) ...
+! This VM is having trouble accessing https://registry.k8s.io
+* To pull new external images, you may need to configure a proxy: https://minikube.sigs.k8s.io/docs/reference/networking/proxy/
+* Подготавливается Kubernetes v1.25.3 на Docker 20.10.20 ...
+  - Generating certificates and keys ...
+  - Booting up control plane ...
+  - Configuring RBAC rules ...
+  - Используется образ docker.io/kubernetesui/metrics-scraper:v1.0.8
+  - Используется образ docker.io/kubernetesui/dashboard:v2.7.0
+  - Используется образ gcr.io/k8s-minikube/storage-provisioner:v5
+  - Используется образ k8s.gcr.io/metrics-server/metrics-server:v0.6.1
+* Компоненты Kubernetes проверяются ...
+* Some dashboard features require the metrics-server addon. To enable all features please run:
+
+        minikube addons enable metrics-server
+
+
+* Включенные дополнения: default-storageclass, storage-provisioner, metrics-server, dashboard
+* Готово! kubectl настроен для использования кластера "minikube" и "default" пространства имён по умолчанию
