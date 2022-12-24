@@ -38,11 +38,9 @@ kind: Service
 metadata:
   name: users-app-service
 spec:
-  type: LoadBalancer      #This only to get access to service from outside by nodePort
   selector:
     app: users-app
   ports:
     - protocol: TCP
       port: 8001
       targetPort: 8080
-      nodePort: 30001
