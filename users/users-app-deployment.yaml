@@ -21,9 +21,15 @@ spec:
           - containerPort: 8080
         env:
           - name: POSTGRES_DB_HOST
-            value: "users-pg-db-service"
+            valueFrom:
+              configMapKeyRef:
+                name: users-config
+                key: postgres_db_host
           - name: POSTGRES_DB_PORT
-            value: "54321"
+            valueFrom:
+              configMapKeyRef:
+                name: users-config
+                key: postgres_db_port
 
 ---
 
