@@ -1,4 +1,4 @@
-# kubernetes (K8s). Part 2
+# kubernetes (K8s). Part 4
 Moving env variables from users-app-deployment.yaml file to users-config.yaml.
 
 ## Create users-config.yaml file 
