@@ -49,4 +49,74 @@ users-app-deployment.yaml; users-config.yaml; users-ingress.yaml; users-pg-db-de
 files:
 users-config.yaml; users-ingress.yaml; users-app-deployment.yaml and users-pg-db-deployment.yaml        
 
+## Installing apps with helm configuration
+### Install helm chart
+``
+helm install users-helm helm/
+``
 
+Result:     
+``
+PS D:\projects\examples\microservices\users\devops\K8s> helm install users-helm helm/
+Error: INSTALLATION FAILED: ConfigMap in version "v1" cannot be handled as a ConfigMap: json: cannot unmarshal number into Go struct field ConfigMap.data of type string
+``
+
+Find a solution in devops/K8s/issue-helm-configmaps-number-as-string.md
+
+Then upgrade or delete and repeat installation by helm
+
+### Delete the app (if required)
+``
+helm delete users-helm
+``
+
+Result:     
+``
+PS D:\projects\examples\microservices\users\devops\K8s> helm delete users-helm
+release "users-helm" uninstalled
+``
+
+### Upgrade the apps by helm
+``
+helm upgrade users-helm helm/
+``
+
+Result:     
+``
+PS D:\projects\examples\microservices\users\devops\K8s> helm upgrade users-helm helm/
+Release "users-helm" has been upgraded. Happy Helming!
+NAME: users-helm
+LAST DEPLOYED: Sun Dec 25 13:39:04 2022
+NAMESPACE: default
+STATUS: deployed
+REVISION: 4
+TEST SUITE: None
+``
+
+### Get lists of apps in helm
+``
+helm list
+``
+
+Result:     
+``
+PS D:\projects\examples\microservices\users\devops\K8s> helm list
+NAME            NAMESPACE       REVISION        UPDATED                                 STATUS          CHART                   APP VERSION
+users-helm      default         4               2022-12-25 13:39:04.3593219 +0300 MSK   deployed        users-0.0.1-SNAPSHOT    0.0.1
+``
+
+### Create schema in users database manually
+### Check pods
+``
+kubectl get pods
+``
+
+Result:     
+``
+PS D:\projects\examples\microservices\users\devops\K8s> kubectl get pods
+NAME                                     READY   STATUS    RESTARTS   AGE
+users-app-deployment-58b778899c-4zwx2    1/1     Running   0          19m
+users-app-deployment-58b778899c-c9slv    1/1     Running   3          19m
+users-pg-db-deployment-bdc84b778-2fqnh   1/1     Running   0          19m
+users-pg-db-deployment-bdc84b778-pj7hh   1/1     Running   0          19m
+``
