@@ -42,4 +42,5 @@ I wish that a new folder name was "helm".
 helm create helm
 ``
 ### Delete all items in the folders: templates and charts
+### Update Chart.yaml file
 ### Copy into 
