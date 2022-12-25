@@ -1,34 +1,34 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: users-app-deployment
+  name: {{ .Values.app.name }}-deployment
   labels:
-    app: users-app
+    app: {{ .Values.app.name }}
 spec:
-  replicas: 2
+  replicas: {{ .Values.app.replicaCount }}
   selector:
     matchLabels:
-      app: users-app
+      app: {{ .Values.app.name }}
   template:
     metadata:
       labels:
-        app: users-app
+        app: {{ .Values.app.name }}
     spec:
       containers:
-      - name: users-app
-        image: yuryli/k8s-users-app:11
+      - name: {{ .Values.app.name }}
+        image: {{ .Values.app.container.image }}
         ports:
           - containerPort: 8080
         env:
           - name: POSTGRES_DB_HOST
             valueFrom:
               configMapKeyRef:
-                name: users-config
+                name: {{ .Values.base.config }}
                 key: postgres_db_host
           - name: POSTGRES_DB_PORT
             valueFrom:
               configMapKeyRef:
-                name: users-config
+                name: {{ .Values.base.config }}
                 key: postgres_db_port
 
 ---
@@ -36,11 +36,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: users-app-service
+  name: {{ .Values.app.ingress.service.name }}
 spec:
   selector:
-    app: users-app
+    app: {{ .Values.app.name }}
   ports:
     - protocol: TCP
-      port: 8001
+      port: {{ .Values.app.ingress.service.port }}
       targetPort: 8080

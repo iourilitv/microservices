@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: users-pg-db-deployment
+  name: {{ .Values.db.name }}-deployment
   labels:
-    app: users-pg-db
+    app: {{ .Values.db.name }}
 spec:
-  replicas: 2
+  replicas: {{ .Values.db.replicaCount }}
   selector:
     matchLabels:
-      app: users-pg-db
+      app: {{ .Values.db.name }}
   template:
     metadata:
       labels:
-        app: users-pg-db
+        app: {{ .Values.db.name }}
     spec:
       containers:
-      - name: users-pg-db
-        image: yuryli/k8s-users-pg-db:14.6
+      - name: {{ .Values.db.name }}
+        image: {{ .Values.db.container.image }}
         ports:
           - containerPort: 5432
         env:
@@ -34,13 +34,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: users-pg-db-service
+  name: {{ .Values.db.service.name }}
 spec:
   type: LoadBalancer      #This only to get access to service from outside by nodePort. In order to use pgAdmin to configure database
   selector:
-    app: users-pg-db
+    app: {{ .Values.db.name }}
   ports:
     - protocol: TCP
-      port: 54321
+      port: {{ .Values.db.service.port }}
       targetPort: 5432
       nodePort: 30543

@@ -45,4 +45,8 @@ helm create helm
 ### Update Chart.yaml file
 ### Copy from project core folder into devops/K8s/helm/templates folder the following files:
 users-app-deployment.yaml; users-config.yaml; users-ingress.yaml; users-pg-db-deployment.yaml
+### Replace users app values by variables in values.yaml:
+files:
+users-config.yaml; users-ingress.yaml; users-app-deployment.yaml and users-pg-db-deployment.yaml        
+
 
