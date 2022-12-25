@@ -43,4 +43,6 @@ helm create helm
 ``
 ### Delete all items in the folders: templates and charts
 ### Update Chart.yaml file
-### Copy into 
+### Copy from project core folder into devops/K8s/helm/templates folder the following files:
+users-app-deployment.yaml; users-config.yaml; users-ingress.yaml; users-pg-db-deployment.yaml
+
