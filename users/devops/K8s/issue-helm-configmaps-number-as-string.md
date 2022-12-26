@@ -31,11 +31,20 @@ Error: INSTALLATION FAILED: ConfigMap in version "v1" cannot be handled as a Con
 ``
 
 ## Solution
-### Wrap port value with '' or ""
+### Way 1. Wrap port value with '' or ""
 ``
 data:
 ...
 postgres_db_port: '{{ .Values.db.service.port }}'
+``
+
+### Way 2. The Best solution is to add  | quote instead of ''  
+Source: https://helm.sh/docs/chart_template_guide/control_structures/#controlling-whitespace     
+
+``
+data:
+...
+postgres_db_port: {{ .Values.apps.db.service.port | quote }}
 ``
 
 ### Confirmation that it works correctly
