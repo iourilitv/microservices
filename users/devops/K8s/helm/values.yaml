@@ -36,8 +36,8 @@ apps:
       image:
         name: yuryli/k8s-users-pg-db
         version: 14.6
-    port: 5432
-    env:
+      port: 5432
+      env:
       - name: POSTGRES_DB
         value: "users"
       - name: POSTGRES_USER
