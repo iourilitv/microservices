@@ -4,22 +4,51 @@ base:
   name: users
   config: users-config
 
-app:
-  name: users-app
-  host: users.local
-  container:
-    image: yuryli/k8s-users-app:11
-  replicaCount: 2
-  ingress:
+apps:
+  backend:
+    appName: users-app
+    host: users.local
+    replicaCount: 2
+    container:
+      image:
+        name: yuryli/k8s-users-app
+        version: 11
+      port: 8080
+      env:
+        - name: POSTGRES_DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: users-config
+              key: postgres_db_host
+        - name: POSTGRES_DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: users-config
+              key: postgres_db_port
     service:
       name: users-app-service
       port: 8001
-
-db:
-  name: users-pg-db
-  container:
-    image: yuryli/k8s-users-pg-db:14.6
-  replicaCount: 2
-  service:
-    name: users-pg-db-service
-    port: 54321
+      targetPort: 8080
+  db:
+    appName: users-pg-db
+    replicaCount: 2
+    container:
+      image:
+        name: yuryli/k8s-users-pg-db
+        version: 14.6
+    port: 5432
+    env:
+      - name: POSTGRES_DB
+        value: "users"
+      - name: POSTGRES_USER
+        value: "microuser"
+      - name: POSTGRES_PASSWORD
+        value: "microuser"
+      - name: PGDATA
+        value: "/var/lib/postgresql/data/pgdata"
+    service:
+      name: users-pg-db-service
+      type: LoadBalancer
+      port: 54321
+      targetPort: 5432
+      nodePort: 30543

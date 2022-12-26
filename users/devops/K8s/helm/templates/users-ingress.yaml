@@ -4,13 +4,13 @@ metadata:
   name: {{ .Values.base.name }}-ingress
 spec:
   rules:
-    - host: {{ .Values.app.host }}
+    - host: {{ .Values.apps.backend.host }}
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: {{ .Values.app.ingress.service.name }}
+                name: {{ .Values.apps.backend.service.name }}
                 port:
-                  number: {{ .Values.app.ingress.service.port }}
+                  number: {{ .Values.apps.backend.service.port }}

@@ -120,3 +120,62 @@ users-app-deployment-58b778899c-c9slv    1/1     Running   3          19m
 users-pg-db-deployment-bdc84b778-2fqnh   1/1     Running   0          19m
 users-pg-db-deployment-bdc84b778-pj7hh   1/1     Running   0          19m
 ``
+
+## Using templates for deployment and service
+### Create a file with deployment and service templates
+devops/K8s/helm/templates/_templates.yaml
+### Create a file with a generating schema for deployment and service templates
+devops/K8s/helm/templates/apps.yaml
+### Update values file with the templates keys
+devops/K8s/helm/values.yaml
+### Update ConfigMap file with the templates keys
+devops/K8s/helm/templates/users-config.yaml
+### Update Ingress file with the templates keys
+devops/K8s/helm/templates/users-ingress.yaml
+### Check the templates
+``
+helm lint ./devops/K8s/helm
+``
+
+Results:        
+``
+PS D:\projects\examples\microservices\users> helm lint ./devops/K8s/helm
+==> Linting ./devops/K8s/helm
+[INFO] Chart.yaml: icon is recommended
+[ERROR] templates/: parse error at (users/templates/apps.yaml:2): undefined variable "$val"
+
+Error: 1 chart(s) linted, 1 chart(s) failed
+
+``
+
+After syntax mistake fixing     
+``
+PS D:\projects\examples\microservices\users> helm lint ./devops/K8s/helm
+==> Linting ./devops/K8s/helm
+[INFO] Chart.yaml: icon is recommended
+[ERROR] templates/: template: users/templates/users-pg-db-deployment.yaml:4:18: executing "users/templates/users-pg-db-deployment.yaml" at <.Values.db.name>: nil pointer evaluating interface {}.name
+
+Error: 1 chart(s) linted, 1 chart(s) failed
+
+``
+
+The reason is that the keys in value file has been updated.         
+So to fix it just delete old deployment files in devops/K8s/helm/templates/.
+After deleting.     
+``
+PS D:\projects\examples\microservices\users> helm lint ./devops/K8s/helm
+==> Linting ./devops/K8s/helm
+[INFO] Chart.yaml: icon is recommended
+
+1 chart(s) linted, 0 chart(s) failed
+
+``
+
+### Get info about generated deployments and services
+``
+helm template ./devops/K8s/helm
+``
+
+Result:     
+Find an issue in devops/K8s/issue-helm-templates-wrong-generated.md
+

@@ -3,5 +3,5 @@ kind: ConfigMap
 metadata:
   name: {{ .Values.base.config }}
 data:
-  postgres_db_host: {{ .Values.db.service.name }}
-  postgres_db_port: '{{ .Values.db.service.port }}'
+  postgres_db_host: {{ .Values.apps.db.service.name }}
+  postgres_db_port: '{{ .Values.apps.db.service.port }}'
