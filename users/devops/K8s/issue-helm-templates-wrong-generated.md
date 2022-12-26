@@ -25,3 +25,12 @@ metadata:
     app: users-pg-db        
 ..      
 ``
+
+## Reason.
+"---" splitter is absent after service template rendering in apps.yaml
+
+## Solution
+Add "---" splitter in apps.yaml after {{- template "users.service" $val }} line
+
+## Result
+Find it in devops/K8s/logs/issue-helm-templates-wrong-generated-FIXED.log

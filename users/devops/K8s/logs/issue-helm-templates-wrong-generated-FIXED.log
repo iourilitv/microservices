@@ -1,0 +1,137 @@
+PS D:\projects\examples\microservices\users> helm template ./devops/K8s/helm
+---
+# Source: users/templates/users-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: users-config
+data:
+  postgres_db_host: users-pg-db-service
+  postgres_db_port: "54321"
+---
+# Source: users/templates/apps-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: users-app-service
+spec:
+
+  selector:
+    app: users-app
+  ports:
+    - protocol: TCP
+      port: 8001
+      targetPort: 8080
+---
+# Source: users/templates/apps-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: users-pg-db-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: users-pg-db
+  ports:
+    - protocol: TCP
+      port: 54321
+      targetPort: 5432
+      nodePort: 30543
+---
+# Source: users/templates/apps-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users-app-deployment
+  labels:
+    app: users-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: users-app
+  template:
+    metadata:
+      labels:
+        app: users-app
+    spec:
+      containers:
+      - name: users-app
+        image: yuryli/k8s-users-app:11
+        ports:
+          - containerPort: 8080
+        resources:
+          requests:
+            memory: 256M  #256MB
+            cpu: 100m     #10% of total cpu capacity
+          limits:
+            memory: 512M  #512MB
+            cpu: 200m     #20% of total cpu capacity
+        env:              #indent 8 adds 8 spaces
+        - name: POSTGRES_DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: postgres_db_host
+              name: users-config
+        - name: POSTGRES_DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: postgres_db_port
+              name: users-config
+---
+# Source: users/templates/apps-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users-pg-db-deployment
+  labels:
+    app: users-pg-db
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: users-pg-db
+  template:
+    metadata:
+      labels:
+        app: users-pg-db
+    spec:
+      containers:
+      - name: users-pg-db
+        image: yuryli/k8s-users-pg-db:14.6
+        ports:
+          - containerPort: 5432
+        resources:
+          requests:
+            memory: 256M  #256MB
+            cpu: 100m     #10% of total cpu capacity
+          limits:
+            memory: 512M  #512MB
+            cpu: 200m     #20% of total cpu capacity
+        env:              #indent 8 adds 8 spaces
+        - name: POSTGRES_DB
+          value: users
+        - name: POSTGRES_USER
+          value: microuser
+        - name: POSTGRES_PASSWORD
+          value: microuser
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+---
+# Source: users/templates/users-ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: users-ingress
+spec:
+  rules:
+    - host: users.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: users-app-service
+                port:
+                  number: 8001

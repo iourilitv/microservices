@@ -178,4 +178,54 @@ helm template ./devops/K8s/helm
 
 Result:     
 Find an issue in devops/K8s/issue-helm-templates-wrong-generated.md
+Fixed.
 
+### Repeat Upgrade the apps by helm
+``
+helm upgrade users-helm devops/K8s/helm/
+``
+
+Result:     
+``
+PS D:\projects\examples\microservices\users> helm upgrade users-helm devops/K8s/helm/
+Release "users-helm" has been upgraded. Happy Helming!
+NAME: users-helm
+LAST DEPLOYED: Mon Dec 26 16:07:58 2022
+NAMESPACE: default
+STATUS: deployed
+REVISION: 3
+TEST SUITE: None
+``
+
+### Check upgrading
+``
+kubectl get all
+``
+
+Result:     
+``
+PS D:\projects\examples\microservices\users> kubectl get all
+NAME                                         READY   STATUS              RESTARTS        AGE
+pod/users-app-deployment-58b778899c-4zwx2    1/1     Running             6 (7h56m ago)   26h
+pod/users-app-deployment-58b778899c-c9slv    1/1     Running             8 (7h59m ago)   26h
+pod/users-app-deployment-79c98f75cc-wdkp5    0/1     ContainerCreating   0               33s
+pod/users-pg-db-deployment-587b88c46-q6p67   0/1     ContainerCreating   0               33s
+pod/users-pg-db-deployment-bdc84b778-2fqnh   1/1     Running             1 (23h ago)     26h
+pod/users-pg-db-deployment-bdc84b778-pj7hh   1/1     Running             1 (23h ago)     26h
+
+NAME                          TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)           AGE
+service/kubernetes            ClusterIP      10.96.0.1       <none>        443/TCP           27h
+service/users-app-service     ClusterIP      10.104.246.39   <none>        8001/TCP          26h
+service/users-pg-db-service   LoadBalancer   10.105.42.208   <pending>     54321:30543/TCP   26h
+
+NAME                                     READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/users-app-deployment     2/2     1            2           26h
+deployment.apps/users-pg-db-deployment   2/2     1            2           26h
+
+NAME                                               DESIRED   CURRENT   READY   AGE
+replicaset.apps/users-app-deployment-58b778899c    2         2         2       26h
+replicaset.apps/users-app-deployment-79c98f75cc    1         1         0       33s
+replicaset.apps/users-pg-db-deployment-587b88c46   1         1         0       33s
+replicaset.apps/users-pg-db-deployment-bdc84b778   2         2         2       26h
+
+``
