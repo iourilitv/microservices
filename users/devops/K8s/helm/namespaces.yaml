@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name:
+    users-test
+
+---
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name:
+    users-dev
+
+---
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name:
+    users-prod

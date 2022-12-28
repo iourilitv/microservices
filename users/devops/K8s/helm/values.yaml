@@ -3,10 +3,12 @@
 base:
   name: users
   config: users-config
+  namespace: &namespace default
 
 apps:
   backend:
     appName: users-app
+    namespace: *namespace
     host: users.local
     replicaCount: 2
     container:
@@ -31,6 +33,7 @@ apps:
       targetPort: 8080
   db:
     appName: users-pg-db
+    namespace: *namespace
     replicaCount: 2
     container:
       image:
