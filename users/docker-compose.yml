@@ -4,6 +4,8 @@ services:
   app-compose:
     build:
       context: ./
+      dockerfile: Dockerfile
+    image: users-app-compose:11
     ports:
       - "8001:8080"
     depends_on:

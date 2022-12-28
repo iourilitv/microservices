@@ -1,0 +1,331 @@
+
+
+
+C:\Users\iurii>kubectl create deployment users-pg-db --image=postgres:14.6
+deployment.apps/users-pg-db created
+
+C:\Users\iurii>kubectl get deployment.apps
+NAME          READY   UP-TO-DATE   AVAILABLE   AGE
+users-pg-db   0/1     1            0           8m31s
+
+C:\Users\iurii>kubectl get deployment.apps
+NAME          READY   UP-TO-DATE   AVAILABLE   AGE
+users-pg-db   0/1     1            0           9m21s
+
+C:\Users\iurii>kubectl get deployment.apps
+NAME          READY   UP-TO-DATE   AVAILABLE   AGE
+users-pg-db   0/1     1            0           19m
+
+C:\Users\iurii>kubectl get replicasets
+NAME                     DESIRED   CURRENT   READY   AGE
+users-pg-db-566c784467   1         1         0       21m
+
+C:\Users\iurii>kubectl get pods
+NAME                           READY   STATUS             RESTARTS   AGE
+users-pg-db-566c784467-b6jz7   0/1     ImagePullBackOff   0          22m
+
+C:\Users\iurii>minikube docker-env --shell powershell
+$Env:DOCKER_TLS_VERIFY = "1"
+$Env:DOCKER_HOST = "tcp://192.168.59.101:2376"
+$Env:DOCKER_CERT_PATH = "C:\Users\iurii\.minikube\certs"
+$Env:MINIKUBE_ACTIVE_DOCKERD = "minikube"
+# To point your shell to minikube's docker-daemon, run:
+# & minikube -p minikube docker-env --shell powershell | Invoke-Expression
+
+C:\Users\iurii>& minikube docker-env --shell powershell | Invoke-Expression
+Непредвиденное появление: &.
+
+C:\Users\iurii>minikube docker-env --shell powershell | Invoke-Expression
+"Invoke-Expression" не является внутренней или внешней
+командой, исполняемой программой или пакетным файлом.
+
+C:\Users\iurii>minikube -p minikube docker-env --shell powershell
+$Env:DOCKER_TLS_VERIFY = "1"
+$Env:DOCKER_HOST = "tcp://192.168.59.101:2376"
+$Env:DOCKER_CERT_PATH = "C:\Users\iurii\.minikube\certs"
+$Env:MINIKUBE_ACTIVE_DOCKERD = "minikube"
+# To point your shell to minikube's docker-daemon, run:
+# & minikube -p minikube docker-env --shell powershell | Invoke-Expression
+
+C:\Users\iurii>kubectl get pods
+NAME                           READY   STATUS             RESTARTS   AGE
+users-pg-db-566c784467-b6jz7   0/1     ImagePullBackOff   0          33m
+
+C:\Users\iurii>kubectl create deployment users-pg-db --image=postgres:14.6
+error: failed to create deployment: deployments.apps "users-pg-db" already exists
+
+C:\Users\iurii>kubectl delete deployment users-pg-db
+deployment.apps "users-pg-db" deleted
+
+C:\Users\iurii>kubectl get pods
+No resources found in default namespace.
+
+C:\Users\iurii>kubectl get replicasets
+No resources found in default namespace.
+
+C:\Users\iurii>kubectl get deployment.apps
+No resources found in default namespace.
+
+C:\Users\iurii>kubectl create deployment users-pg-db --image=app/postgres:14.6
+deployment.apps/users-pg-db created
+
+C:\Users\iurii>kubectl get deployment.apps
+NAME          READY   UP-TO-DATE   AVAILABLE   AGE
+users-pg-db   0/1     1            0           11s
+
+C:\Users\iurii>kubectl get pods
+NAME                           READY   STATUS             RESTARTS   AGE
+users-pg-db-5444c46fcf-z8btp   0/1     ImagePullBackOff   0          23s
+
+C:\Users\iurii>kubectl describe users-pg-db
+error: the server doesn't have a resource type "users-pg-db"
+
+C:\Users\iurii>kubectl describe users-pg-db-5444c46fcf-z8btp
+error: the server doesn't have a resource type "users-pg-db-5444c46fcf-z8btp"
+
+C:\Users\iurii>kubectl describe pod users-pg-db-5444c46fcf-z8btp
+Name:             users-pg-db-5444c46fcf-z8btp
+Namespace:        default
+Priority:         0
+Service Account:  default
+Node:             minikube/192.168.59.101
+Start Time:       Wed, 21 Dec 2022 13:25:44 +0300
+Labels:           app=users-pg-db
+pod-template-hash=5444c46fcf
+Annotations:      <none>
+Status:           Pending
+IP:               172.17.0.6
+IPs:
+IP:           172.17.0.6
+Controlled By:  ReplicaSet/users-pg-db-5444c46fcf
+Containers:
+postgres:
+Container ID:
+Image:          app/postgres:14.6
+Image ID:
+Port:           <none>
+Host Port:      <none>
+State:          Waiting
+Reason:       ImagePullBackOff
+Ready:          False
+Restart Count:  0
+Environment:    <none>
+Mounts:
+/var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-pjqh7 (ro)
+Conditions:
+Type              Status
+Initialized       True
+Ready             False
+ContainersReady   False
+PodScheduled      True
+Volumes:
+kube-api-access-pjqh7:
+Type:                    Projected (a volume that contains injected data from multiple sources)
+TokenExpirationSeconds:  3607
+ConfigMapName:           kube-root-ca.crt
+ConfigMapOptional:       <nil>
+DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+Type     Reason       Age                  From               Message
+  ----     ------       ----                 ----               -------
+Normal   Scheduled    2m49s                default-scheduler  Successfully assigned default/users-pg-db-5444c46fcf-z8btp to minikube
+Warning  FailedMount  2m48s                kubelet            MountVolume.SetUp failed for volume "kube-api-access-pjqh7" : failed to sync configmap cache: timed out waiting for the condition
+Normal   Pulling      76s (x4 over 2m44s)  kubelet            Pulling image "app/postgres:14.6"
+Warning  Failed       74s (x4 over 2m42s)  kubelet            Failed to pull image "app/postgres:14.6": rpc error: code = Unknown desc = Error response from daemon: pull access denied for app/postgres, repository does not exist or may require 'docker login': denied: requested access to the resource is denied
+Warning  Failed       74s (x4 over 2m42s)  kubelet            Error: ErrImagePull
+Normal   BackOff      46s (x6 over 2m40s)  kubelet            Back-off pulling image "app/postgres:14.6"
+Warning  Failed       46s (x6 over 2m40s)  kubelet            Error: ImagePullBackOff
+
+-----------
+
+The image has been pulled but
+
+``
+PS C:\WINDOWS\system32> kubectl describe pod users-pg-db-844744fc4-nvjmf
+Name:             users-pg-db-844744fc4-nvjmf
+Namespace:        default
+Priority:         0
+Service Account:  default
+Node:             minikube/192.168.59.102
+Start Time:       Thu, 22 Dec 2022 13:56:27 +0300
+Labels:           app=users-pg-db
+pod-template-hash=844744fc4
+Annotations:      <none>
+Status:           Pending
+IP:               172.17.0.6
+IPs:
+IP:           172.17.0.6
+Controlled By:  ReplicaSet/users-pg-db-844744fc4
+Containers:
+k8s-users-pg-db:
+Container ID:
+Image:          yuryli/k8s-users-pg-db:14.6
+Image ID:
+Port:           <none>
+Host Port:      <none>
+State:          Waiting
+Reason:       ErrImagePull
+Ready:          False
+Restart Count:  0
+Environment:    <none>
+Mounts:
+/var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-ptj5h (ro)
+Conditions:
+Type              Status
+Initialized       True
+Ready             False
+ContainersReady   False
+PodScheduled      True
+Volumes:
+kube-api-access-ptj5h:
+Type:                    Projected (a volume that contains injected data from multiple sources)
+TokenExpirationSeconds:  3607
+ConfigMapName:           kube-root-ca.crt
+ConfigMapOptional:       <nil>
+DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+Type     Reason     Age                    From               Message
+  ----     ------     ----                   ----               -------
+Normal   Scheduled  4m41s                  default-scheduler  Successfully assigned default/users-pg-db-844744fc4-nvjmf to minikube
+Normal   Pulling    2m21s (x2 over 4m34s)  kubelet            Pulling image "yuryli/k8s-users-pg-db:14.6"
+Warning  Failed     21s (x2 over 2m35s)    kubelet            Failed to pull image "yuryli/k8s-users-pg-db:14.6": rpc error: code = Unknown desc = context deadline exceeded
+Warning  Failed     21s (x2 over 2m35s)    kubelet            Error: ErrImagePull
+Normal   BackOff    6s (x2 over 2m34s)     kubelet            Back-off pulling image "yuryli/k8s-users-pg-db:14.6"
+Warning  Failed     6s (x2 over 2m34s)     kubelet            Error: ImagePullBackOff
+``
+
+Trying to delete deployment and create again.
+
+``
+PS C:\WINDOWS\system32> kubectl delete deployment users-pg-db
+deployment.apps "users-pg-db" deleted
+
+PS C:\WINDOWS\system32> kubectl get deployments
+No resources found in default namespace.
+
+PS C:\WINDOWS\system32> kubectl get deployment.apps
+No resources found in default namespace.
+
+PS C:\WINDOWS\system32> kubectl create deployment users-pg-db --image=yuryli/k8s-users-pg-db:14.6
+deployment.apps/users-pg-db created
+
+PS C:\WINDOWS\system32> kubectl get pods
+NAME                          READY   STATUS   RESTARTS   AGE
+users-pg-db-844744fc4-xk9fs   0/1     Error    0          14s
+
+PS C:\WINDOWS\system32> kubectl get pods
+NAME                          READY   STATUS             RESTARTS      AGE
+users-pg-db-844744fc4-xk9fs   0/1     CrashLoopBackOff   2 (33s ago)   67s
+
+PS C:\WINDOWS\system32> kubectl describe pod users-pg-db-844744fc4-xk9fs
+Name:             users-pg-db-844744fc4-xk9fs
+Namespace:        default
+Priority:         0
+Service Account:  default
+Node:             minikube/192.168.59.102
+Start Time:       Thu, 22 Dec 2022 14:25:55 +0300
+Labels:           app=users-pg-db
+                  pod-template-hash=844744fc4
+Annotations:      <none>
+Status:           Running
+IP:               172.17.0.6
+IPs:
+  IP:           172.17.0.6
+Controlled By:  ReplicaSet/users-pg-db-844744fc4
+Containers:
+  k8s-users-pg-db:
+    Container ID:   docker://0ad49e098e974e7cca46572f1de3bb11aff069f5322cf41b026e306d3f894352
+    Image:          yuryli/k8s-users-pg-db:14.6
+    Image ID:       docker-pullable://yuryli/k8s-users-pg-db@sha256:3e87ab1ea1fe4fa1d297c5718534d3e472447deee6ff1f8f03accec05c9b7c25
+    Port:           <none>
+    Host Port:      <none>
+    State:          Waiting
+      Reason:       CrashLoopBackOff
+    Last State:     Terminated
+      Reason:       Error
+      Exit Code:    1
+      Started:      Thu, 22 Dec 2022 14:26:59 +0300
+      Finished:     Thu, 22 Dec 2022 14:27:01 +0300
+    Ready:          False
+    Restart Count:  3
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-bwb9d (ro)
+Conditions:
+  Type              Status
+  Initialized       True
+  Ready             False
+  ContainersReady   False
+  PodScheduled      True
+Volumes:
+  kube-api-access-bwb9d:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type     Reason     Age                 From               Message
+  ----     ------     ----                ----               -------
+  Normal   Scheduled  112s                default-scheduler  Successfully assigned default/users-pg-db-844744fc4-xk9fs to minikube
+  Normal   Pulled     51s (x4 over 108s)  kubelet            Container image "yuryli/k8s-users-pg-db:14.6" already present on machine
+  Normal   Created    50s (x4 over 107s)  kubelet            Created container k8s-users-pg-db
+  Normal   Started    48s (x4 over 106s)  kubelet            Started container k8s-users-pg-db
+  Warning  BackOff    9s (x9 over 96s)    kubelet            Back-off restarting failed container
+
+PS C:\WINDOWS\system32> kubectl get pods
+NAME                          READY   STATUS             RESTARTS      AGE
+users-pg-db-844744fc4-xk9fs   0/1     CrashLoopBackOff   5 (50s ago)   4m19s
+``
+
+Getting logs of the pod creating. !!!A problem is in db installing.!!!
+
+``
+PS C:\WINDOWS\system32> kubectl --v=8 logs users-pg-db-844744fc4-xk9fs
+I1222 14:46:32.962461    1204 loader.go:374] Config loaded from file:  C:\Users\iurii\.kube\config
+I1222 14:46:33.036129    1204 cert_rotation.go:137] Starting client certificate rotation controller
+I1222 14:46:33.075821    1204 round_trippers.go:463] GET https://192.168.59.102:8443/api/v1/namespaces/default/pods/users-pg-db-844744fc4-xk9fs
+I1222 14:46:33.075821    1204 round_trippers.go:469] Request Headers:
+I1222 14:46:33.079733    1204 round_trippers.go:473]     Accept: application/json, */*
+I1222 14:46:33.080699    1204 round_trippers.go:473]     User-Agent: kubectl.exe/v1.25.2 (windows/amd64) kubernetes/5835544
+I1222 14:46:33.142097    1204 round_trippers.go:574] Response Status: 200 OK in 60 milliseconds
+I1222 14:46:33.142629    1204 round_trippers.go:577] Response Headers:
+I1222 14:46:33.146473    1204 round_trippers.go:580]     Date: Thu, 22 Dec 2022 11:46:33 GMT
+I1222 14:46:33.147439    1204 round_trippers.go:580]     Audit-Id: 60bc5fe7-d4ea-42bd-83e8-1efd75d7c984
+I1222 14:46:33.148413    1204 round_trippers.go:580]     Cache-Control: no-cache, private
+I1222 14:46:33.149384    1204 round_trippers.go:580]     Content-Type: application/json
+I1222 14:46:33.150359    1204 round_trippers.go:580]     X-Kubernetes-Pf-Flowschema-Uid: 33704b2e-6a12-4963-9a29-3448dbb210b0
+I1222 14:46:33.152315    1204 round_trippers.go:580]     X-Kubernetes-Pf-Prioritylevel-Uid: 6e70346f-cb91-4e21-b0f4-d56daf395f78
+I1222 14:46:33.155251    1204 request.go:1154] Response Body: {"kind":"Pod","apiVersion":"v1","metadata":{"name":"users-pg-db-844744fc4-xk9fs","generateName":"users-pg-db-844744fc4-","namespace":"default","uid":"19f353e9-2d6c-4b48-8fff-d6dec4397faa","resourceVersion":"4366","creationTimestamp":"2022-12-22T11:25:54Z","labels":{"app":"users-pg-db","pod-template-hash":"844744fc4"},"ownerReferences":[{"apiVersion":"apps/v1","kind":"ReplicaSet","name":"users-pg-db-844744fc4","uid":"2cf236a5-71f6-4392-bf1c-6603d0d52bce","controller":true,"blockOwnerDeletion":true}],"managedFields":[{"manager":"kube-controller-manager","operation":"Update","apiVersion":"v1","time":"2022-12-22T11:25:54Z","fieldsType":"FieldsV1","fieldsV1":{"f:metadata":{"f:generateName":{},"f:labels":{".":{},"f:app":{},"f:pod-template-hash":{}},"f:ownerReferences":{".":{},"k:{\"uid\":\"2cf236a5-71f6-4392-bf1c-6603d0d52bce\"}":{}}},"f:spec":{"f:containers":{"k:{\"name\":\"k8s-users-pg-db\"}":{".":{},"f:image":{},"f:imagePullPolicy":{},"f:name":{},"f:resources":{},"f:terminationMessagePath":{},"f:terminationMessa [truncated 3669 chars]
+I1222 14:46:33.239018    1204 round_trippers.go:463] GET https://192.168.59.102:8443/api/v1/namespaces/default/pods/users-pg-db-844744fc4-xk9fs/log?container=k8s-users-pg-db
+I1222 14:46:33.239018    1204 round_trippers.go:469] Request Headers:
+I1222 14:46:33.241954    1204 round_trippers.go:473]     Accept: application/json, */*
+I1222 14:46:33.242927    1204 round_trippers.go:473]     User-Agent: kubectl.exe/v1.25.2 (windows/amd64) kubernetes/5835544
+I1222 14:46:33.342270    1204 round_trippers.go:574] Response Status: 200 OK in 95 milliseconds
+I1222 14:46:33.342270    1204 round_trippers.go:577] Response Headers:
+I1222 14:46:33.346684    1204 round_trippers.go:580]     Cache-Control: no-cache, private
+I1222 14:46:33.347715    1204 round_trippers.go:580]     Content-Type: text/plain
+I1222 14:46:33.348916    1204 round_trippers.go:580]     Date: Thu, 22 Dec 2022 11:46:33 GMT
+I1222 14:46:33.350074    1204 round_trippers.go:580]     Audit-Id: 3ccf2b7f-2922-4608-9650-ba4ce7377ad4
+Error: Database is uninitialized and superuser password is not specified.
+       You must specify POSTGRES_PASSWORD to a non-empty value for the
+       superuser. For example, "-e POSTGRES_PASSWORD=password" on "docker run".
+
+       You may also use "POSTGRES_HOST_AUTH_METHOD=trust" to allow all
+       connections without a password. This is *not* recommended.
+
+       See PostgreSQL documentation about "trust":
+       https://www.postgresql.org/docs/current/auth-trust.html
+``

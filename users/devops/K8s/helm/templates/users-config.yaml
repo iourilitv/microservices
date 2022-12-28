@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.base.config }}
+  namespace: {{ .Values.base.namespace }}
+data:
+  postgres_db_host: {{ .Values.apps.db.service.name }}
+  postgres_db_port: {{ .Values.apps.db.service.port | quote }}

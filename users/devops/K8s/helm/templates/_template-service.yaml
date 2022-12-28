@@ -1,0 +1,18 @@
+{{- define "users.service" }}
+{{- if .service }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .service.name }}
+  namespace: {{ .namespace }}
+spec:
+  {{ if .service.type }}type: {{ .service.type }} {{ end }}
+  selector:
+    app: {{ .appName }}
+  ports:
+    - protocol: TCP
+      port: {{ .service.port }}
+      targetPort: {{ .service.targetPort }}
+      {{ if .service.nodePort }}nodePort: {{ .service.nodePort }} {{ end }}
+{{- end }}
+{{- end }}

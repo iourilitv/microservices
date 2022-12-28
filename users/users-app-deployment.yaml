@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users-app-deployment
+  labels:
+    app: users-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: users-app
+  template:
+    metadata:
+      labels:
+        app: users-app
+    spec:
+      containers:
+      - name: users-app
+        image: yuryli/k8s-users-app:11
+        ports:
+          - containerPort: 8080
+        env:
+          - name: POSTGRES_DB_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: users-config
+                key: postgres_db_host
+          - name: POSTGRES_DB_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: users-config
+                key: postgres_db_port
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: users-app-service
+spec:
+  selector:
+    app: users-app
+  ports:
+    - protocol: TCP
+      port: 8001
+      targetPort: 8080

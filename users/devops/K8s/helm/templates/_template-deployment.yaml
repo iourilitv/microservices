@@ -1,0 +1,35 @@
+{{- define "users.deployment" }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .appName }}-deployment
+  namespace: {{ .namespace }}
+  labels:
+    app: {{ .appName }}
+spec:
+  replicas: {{ .replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .appName }}
+  template:
+    metadata:
+      labels:
+        app: {{ .appName }}
+    spec:
+      containers:
+      - name: {{ .appName }}
+        image: {{ .container.image.name }}:{{ .container.image.version }}
+        ports:
+          - containerPort: {{ .container.port }}
+        resources:
+          requests:
+            memory: 256M  #256MB
+            cpu: 100m     #10% of total cpu capacity
+          limits:
+            memory: 512M  #512MB
+            cpu: 200m     #20% of total cpu capacity
+{{- if .container.env }}
+        env:              #indent 8 adds 8 spaces
+{{ toYaml .container.env | indent 8 }}
+{{- end }}
+{{- end }}

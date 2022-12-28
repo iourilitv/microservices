@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: users-config
+data:
+  postgres_db_host: "users-pg-db-service"
+  postgres_db_port: "54321"

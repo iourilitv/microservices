@@ -1,0 +1,57 @@
+# Default values for my helm chart.
+
+base:
+  name: users
+  config: &configMap users-config
+  namespace: &namespace default
+
+apps:
+  backend:
+    appName: users-app
+    namespace: *namespace
+    host: users.local
+    replicaCount: 2
+    container:
+      image:
+        name: yuryli/k8s-users-app
+        version: 11
+      port: 8080
+      env:
+        - name: POSTGRES_DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: *configMap
+              key: postgres_db_host
+        - name: POSTGRES_DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: *configMap
+              key: postgres_db_port
+    service:
+      name: users-app-service
+      port: 8001
+      targetPort: 8080
+  db:
+    appName: users-pg-db
+    namespace: *namespace
+    replicaCount: 2
+    container:
+      image:
+        name: yuryli/k8s-users-pg-db
+        version: 14.6
+      port: 5432
+      env:
+      - name: POSTGRES_DB
+        value: "users"
+      - name: POSTGRES_USER
+        value: "microuser"
+      - name: POSTGRES_PASSWORD
+        value: "microuser"
+      - name: PGDATA
+        value: "/var/lib/postgresql/data/pgdata"
+    service:
+      name: users-pg-db-service
+      type: LoadBalancer
+      port: 54321
+      targetPort: 5432
+      nodePort: 30543
