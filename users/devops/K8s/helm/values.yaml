@@ -2,7 +2,7 @@
 
 base:
   name: users
-  config: users-config
+  config: &configMap users-config
   namespace: &namespace default
 
 apps:
@@ -20,12 +20,12 @@ apps:
         - name: POSTGRES_DB_HOST
           valueFrom:
             configMapKeyRef:
-              name: users-config
+              name: *configMap
               key: postgres_db_host
         - name: POSTGRES_DB_PORT
           valueFrom:
             configMapKeyRef:
-              name: users-config
+              name: *configMap
               key: postgres_db_port
     service:
       name: users-app-service
