@@ -63,15 +63,46 @@ users-ingress.yaml
 values.yaml
 
 ### Created values-test file
-
-
 ### Added users-test.local into ./etc/hosts file
+192.168.59.102 users-test.local
+192.168.59.102 users-dev.local
+192.168.59.102 users-prod.local
 
-
-## Deploy apps with test namespace
-###
+## Deploying apps with their namespaces
+### Deploy apps with users-test namespace
 ``
 helm install users-test-helm . -f values-test.yaml
+``
+
+Result:  
+``
+PS D:\projects\examples\microservices\users\devops\K8s\helm> helm upgrade users-test-helm . -f values-test.yaml
+Error: UPGRADE FAILED: failed to create resource: Service "users-pg-db-service" is invalid: spec.ports[0].nodePort: Invalid value: 30543: provided port is already allocated
+PS D:\projects\examples\microservices\users\devops\K8s\helm> helm upgrade users-test-helm . -f values-test.yaml
+Release "users-test-helm" has been upgraded. Happy Helming!
+NAME: users-test-helm
+LAST DEPLOYED: Wed Dec 28 12:51:01 2022
+NAMESPACE: default
+STATUS: deployed
+REVISION: 4
+TEST SUITE: None
+``
+
+### Repeating.
+``
+PS D:\projects\examples\microservices\users\devops\K8s\helm> helm delete users-test-helm
+release "users-test-helm" uninstalled
+``
+
+Or after deleted and repeated helm.      
+``
+PS D:\projects\examples\microservices\users\devops\K8s\helm> helm install users-test-helm . -f values-test.yaml
+NAME: users-test-helm
+LAST DEPLOYED: Wed Dec 28 13:02:15 2022
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
 ``
 
 
