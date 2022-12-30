@@ -16,6 +16,10 @@ spec:
       labels:
         app: {{ .appName }}
     spec:
+{{- if .volumes }}
+      volumes:
+{{ toYaml .volumes | indent 6 }}
+{{- end }}
       containers:
       - name: {{ .appName }}
         image: {{ .container.image.name }}:{{ .container.image.version }}
@@ -31,5 +35,9 @@ spec:
 {{- if .container.env }}
         env:              #indent 8 adds 8 spaces
 {{ toYaml .container.env | indent 8 }}
+{{- end }}
+{{- if .container.volumeMounts }}
+        volumeMounts:
+{{ toYaml .container.volumeMounts | indent 8 }}
 {{- end }}
 {{- end }}
