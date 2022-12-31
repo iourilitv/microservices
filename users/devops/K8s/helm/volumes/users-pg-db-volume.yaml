@@ -11,4 +11,4 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: "/pg-db-data"
+    path: "/k8s-pg-db-data"
