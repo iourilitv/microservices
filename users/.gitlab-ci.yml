@@ -1,0 +1,16 @@
+variables:
+  JAVA_VERSION: 11
+  APP_IMAGE: users-app
+
+stages:
+  - build
+
+cache:
+  key: "$CI_COMMIT_REF_SLUG-build-cache"
+  paths:
+    - build/
+
+stage_build:
+  stage: build
+  image: openjdk:$JAVA_VERSION
+  script: "mvn clean install"
