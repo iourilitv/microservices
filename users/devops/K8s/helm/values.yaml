@@ -7,6 +7,7 @@ base:
 
 apps:
   backend:
+    kind: Deployment
     appName: users-app
     namespace: *namespace
     host: users.local
@@ -32,13 +33,10 @@ apps:
       port: 8001
       targetPort: 8080
   db:
+    kind: StatefulSet
     appName: users-pg-db
     namespace: *namespace
     replicaCount: 2
-    volumes:
-      - name: users-pg-db-volume
-        persistentVolumeClaim:
-          claimName: users-pg-db-claim
     container:
       image:
         name: yuryli/k8s-users-pg-db
@@ -54,8 +52,16 @@ apps:
       - name: PGDATA
         value: "/var/lib/postgresql/data/pgdata"
       volumeMounts:
-        - mountPath: "/var/lib/postgresql/data/pgdata"
+        - mountPath: "/var/lib/postgresql/data/"
           name: users-pg-db-volume
+    volumeClaimTemplates:
+    - metadata:
+        name: users-pg-db-volume
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 1Gi
     service:
       name: users-pg-db-service
       type: LoadBalancer

@@ -1,4 +1,4 @@
-# kubernetes (K8s). Part 8
+# kubernetes (K8s). Part 8-1
 Resolving issue-minikube-not-save-state.md.     
 !!! Does not work!!!        
 Apps deploy correctly but data does not save.
