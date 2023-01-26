@@ -17,10 +17,6 @@ spec:
       labels:
         app: {{ .appName }}
     spec:
-{{- if .volumes }}
-      volumes:
-{{ toYaml .volumes | indent 6 }}
-{{- end }}
       containers:
       - name: {{ .appName }}
         image: {{ .container.image.name }}:{{ .container.image.version }}
